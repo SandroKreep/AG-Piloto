@@ -1,0 +1,268 @@
+.map-dashboard {
+  margin-top: 20px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  background: #fff;
+}
+
+.map-dashboard__header {
+  margin-bottom: 16px;
+}
+
+.map-dashboard__title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.map-dashboard__subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.map-dashboard__layout {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 1080px) {
+  .map-dashboard__layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+}
+
+.map-dashboard__main {
+  min-width: 0;
+}
+
+.map-dashboard__tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.map-dashboard__tabs button {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 8px 12px;
+  background: #fff;
+  font-weight: 600;
+}
+
+.map-dashboard__tabs button.is-active {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+
+.control-tower {
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 12px;
+  padding: 12px;
+  background: #f9fafb;
+}
+
+.control-tower__header {
+  margin-bottom: 8px;
+}
+
+.control-tower__header h3,
+.control-tower__header p {
+  margin: 0;
+}
+
+.control-tower__header p {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.control-tower__map {
+  height: 330px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.control-tower__vehicle-icon {
+  background: transparent;
+  border: none;
+}
+
+.control-tower__vehicle-icon span {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  color: #fff;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1px 4px rgba(17, 24, 39, 0.3);
+}
+
+.trip-table {
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+}
+
+.trip-table__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.trip-table__header h3 {
+  margin: 0;
+}
+
+.trip-table__filters {
+  display: flex;
+  gap: 8px;
+}
+
+.trip-table__filters select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.trip-table__wrapper {
+  overflow-x: auto;
+}
+
+.trip-table table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.trip-table th,
+.trip-table td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.82rem;
+}
+
+.trip-table__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.trip-table__actions button,
+.trip-table__pagination button {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: #fff;
+  font-size: 0.78rem;
+}
+
+.trip-table__pagination {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.financial-summary {
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.financial-summary h3 {
+  margin: 0 0 10px;
+}
+
+.financial-summary__grid {
+  display: grid;
+  gap: 8px;
+}
+
+.financial-summary__grid article {
+  border-radius: 10px;
+  padding: 10px;
+  background: #f8fafc;
+}
+
+.financial-summary__grid p {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.financial-summary__grid strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 1rem;
+}
+
+.school-tab {
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.school-tab h3 {
+  margin: 0 0 10px;
+}
+
+.school-tab__list {
+  display: grid;
+  gap: 8px;
+}
+
+.school-tab__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.school-tab__row p,
+.school-tab__row strong {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.school-tab__row--risk {
+  border-color: #ef4444;
+  background: #fef2f2;
+  animation: school-alert 1.2s ease-in-out infinite;
+}
+
+.school-tab__alert {
+  color: #b91c1c;
+  font-weight: 700;
+  margin-top: 4px !important;
+}
+
+@keyframes school-alert {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(239, 68, 68, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+  }
+}
+
+.map-dashboard__message {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+}

@@ -1,0 +1,271 @@
+.home {
+  padding-bottom: 8px;
+}
+
+.home__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.home__brand {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.home__welcome {
+  margin: 0 0 4px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.home__tagline {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.home__avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: var(--shadow-soft);
+}
+
+.home__section {
+  margin-bottom: 24px;
+}
+
+.home__section-title {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.home__section-title--plain {
+  font-weight: 800;
+}
+
+.home__grid {
+  display: grid;
+  gap: 12px;
+}
+
+.home__grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+  .home__avatar {
+    display: none;
+  }
+
+  .home__top {
+    margin-bottom: 40px;
+  }
+
+  .home__brand {
+    font-size: 0.9rem;
+  }
+
+  .home__welcome {
+    font-size: 2.5rem;
+  }
+
+  .home__tagline {
+    font-size: 1.05rem;
+  }
+
+  .home__section {
+    margin-bottom: 40px;
+  }
+
+  .home__section-title {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+  }
+
+  .home__grid--more {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .svc-card {
+    padding: 20px 18px;
+  }
+
+  .svc-card__desc {
+    font-size: 0.85rem;
+  }
+}
+
+.svc-card {
+  background: var(--bg-card-soft);
+  border-radius: var(--radius-lg);
+  padding: 16px 14px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(17, 24, 39, 0.04);
+}
+
+.svc-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+.svc-icon--peach {
+  background: #ffe8dc;
+  color: #ea580c;
+}
+
+.svc-icon--mint {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.svc-icon--yellow {
+  background: #fef9c3;
+  color: #ca8a04;
+}
+
+.svc-icon--pink {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.svc-icon--blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.svc-icon--purple {
+  background: #fff3e0;
+  color: #ff6b35;
+}
+
+.svc-card__title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.svc-card__desc {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.recruit-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+.recruit-card__body {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.recruit-card__badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  background: var(--primary-soft);
+  margin-bottom: 12px;
+}
+
+.recruit-card__title {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.recruit-card__text {
+  margin: 0 0 18px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+  .recruit-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 24px 28px;
+  }
+
+  .recruit-card__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .recruit-card__text {
+    margin-bottom: 0;
+  }
+
+  .recruit-card__cta {
+    flex-shrink: 0;
+    width: auto;
+    min-width: 200px;
+    margin: 0;
+  }
+}
+
+.recruit-card__cta {
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+}
+
+.recruit-card__cta:active {
+  transform: scale(0.99);
+}
+
+.recruit-card__arrow {
+  font-size: 1.15rem;
+  font-weight: 600;
+}

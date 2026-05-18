@@ -1,0 +1,635 @@
+import React, { useEffect, useRef, useState } from 'react'
+import { supabase } from '../lib/supabase'
+import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
+import { reverseGeocodeCoordinates } from '../lib/geoUtils'
+import TripAcceptedView from './TripAcceptedView'
+import './TripRequestForm.css'
+
+// Helper function to format currency
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-AO', {
+    style: 'currency',
+    currency: 'AOA',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+// Basic styling for the form (can be moved to CSS module later)
+const formStyles: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '15px',
+  padding: '20px',
+  borderRadius: '16px',
+  backgroundColor: 'white',
+  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12)',
+  border: 'none',
+  maxWidth: '400px',
+  margin: '20px auto',
+}
+
+const inputStyles: React.CSSProperties = {
+  padding: '10px',
+  borderRadius: '4px',
+  border: '1px solid #d1d5db',
+  backgroundColor: 'white',
+  color: '#1f2937',
+  fontSize: '16px',
+  outline: 'none',
+  transition: 'border-color 0.2s',
+}
+
+const buttonStyles: React.CSSProperties = {
+  padding: '12px 20px',
+  borderRadius: '4px',
+  border: 'none',
+  backgroundColor: '#F97316',
+  color: 'white',
+  fontSize: '16px',
+  cursor: 'pointer',
+  fontWeight: 'bold',
+  transition: 'background-color 0.2s ease-in-out',
+}
+
+const buttonSecondaryStyles: React.CSSProperties = {
+  ...buttonStyles,
+  backgroundColor: '#6b7280',
+}
+
+const summaryStyles: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+  padding: '15px',
+  borderRadius: '8px',
+  backgroundColor: '#f9fafb',
+  border: '1px solid #e5e7eb',
+}
+
+const summaryRowStyles: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '8px 0',
+  borderBottom: '1px solid #e5e7eb',
+}
+
+const summaryLabelStyles: React.CSSProperties = {
+  color: '#6b7280',
+  fontSize: '14px',
+}
+
+const summaryValueStyles: React.CSSProperties = {
+  color: '#1f2937',
+  fontSize: '16px',
+  fontWeight: 'bold',
+}
+
+const priceHighlightStyles: React.CSSProperties = {
+  ...summaryValueStyles,
+  color: '#16a34a',
+  fontSize: '20px',
+}
+
+const successNotificationStyles: React.CSSProperties = {
+  padding: '15px',
+  borderRadius: '8px',
+  marginBottom: '15px',
+  textAlign: 'center',
+  fontWeight: 'bold',
+  backgroundColor: '#dcfce7',
+  color: '#166534',
+  border: '1px solid #bbf7d0',
+}
+
+const buttonGroupStyles: React.CSSProperties = {
+  display: 'flex',
+  gap: '10px',
+}
+
+async function geocodeAddress(address: string) {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`,
+    )
+    const data = await response.json()
+    if (data && data.length > 0) {
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), display_name: data[0].display_name }
+    }
+    return null
+  } catch (error) {
+    console.error('Error geocoding address:', error)
+    return null
+  }
+}
+
+// Helper function to send browser notification
+function sendNotification(title: string, options?: NotificationOptions) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, options)
+  }
+}
+
+export default function TripRequestForm({
+  destinationCoords,
+  setDestinationCoords,
+  destinationAddress,
+  setDestinationAddress,
+}: {
+  destinationCoords: Coordinates | null
+  setDestinationCoords: (coords: Coordinates | null) => void
+  destinationAddress: string | null
+  setDestinationAddress: (address: string | null) => void
+}) {
+  const [originAddress, setOriginAddress] = useState(() => {
+    return sessionStorage.getItem('ag_origin_address') || ''
+  })
+  const [serviceType, setServiceType] = useState<'moto' | 'carro' | 'caminhao'>('moto')
+  const [loading, setLoading] = useState(false)
+  const [latitude, setLatitude] = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
+  const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt')
+  const [showPermissionWarning, setShowPermissionWarning] = useState(false)
+  const [gpsObtained, setGpsObtained] = useState(false)
+  const [activeTripId, setActiveTripId] = useState<string | null>(null)
+  
+  // New states for route summary
+  const [routeData, setRouteData] = useState<{ distanceKm: number; durationMin: number; price: number | null } | null>(null)
+  const [routeLoading, setRouteLoading] = useState(false)
+  const [showSummary, setShowSummary] = useState(false)
+  const [tripAccepted, setTripAccepted] = useState(false)
+  const [acceptedDriver, setAcceptedDriver] = useState<string | null>(null)
+  const [waitingSeconds, setWaitingSeconds] = useState(0)
+  const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null)
+
+  const watchId = useRef<number | null>(null)
+  const subscriptionRef = useRef<any>(null)
+  const waitingTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const driverSubscriptionRef = useRef<any>(null)
+
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      watchId.current = navigator.geolocation.watchPosition(
+        async (position) => {
+          const currentLat = position.coords.latitude;
+          const currentLng = position.coords.longitude;
+          setLatitude(currentLat);
+          setLongitude(currentLng);
+          setLocationPermission('granted');
+          setGpsObtained(true);
+          console.log('Enviando GPS:', currentLat, currentLng);
+
+          const address = await reverseGeocodeCoordinates(currentLat, currentLng);
+          if (address) {
+            setOriginAddress(address);
+          } else {
+            console.warn('Não foi possível reverter o geocoding da localização actual.');
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error)
+          setLocationPermission('denied')
+          setGpsObtained(false)
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 },
+      )
+    } else {
+      console.warn('Geolocation is not supported by this browser.')
+      setLocationPermission('denied')
+      setGpsObtained(false)
+    }
+
+    return () => {
+      if (watchId.current !== null) {
+        navigator.geolocation.clearWatch(watchId.current)
+      }
+    }
+  }, [])
+
+  // Effect to calculate route when origin and destination change
+  useEffect(() => {
+    const calculateRoute = async () => {
+      if (!latitude || !longitude || !destinationCoords) {
+        setRouteData(null)
+        return
+      }
+
+      setRouteLoading(true)
+      try {
+        const origin: Coordinates = { lat: latitude, lng: longitude }
+        const routeInfo = await fetchOsrmRoute(origin, destinationCoords)
+        const distanceKm = routeInfo.distanceMeters / 1000
+        const durationMin = routeInfo.durationSeconds / 60
+        // Rule: 500 Kz base + 300 Kz per km
+        const price = 500 + Math.round(distanceKm * 300)
+
+        setRouteData({
+          distanceKm: Number(distanceKm.toFixed(2)),
+          durationMin: Number(durationMin.toFixed(1)),
+          price,
+        })
+      } catch (error) {
+        console.error('Error calculating route:', error)
+        setRouteData(null)
+      } finally {
+        setRouteLoading(false)
+      }
+    }
+
+    calculateRoute()
+  }, [latitude, longitude, destinationCoords])
+
+  // Save originAddress to sessionStorage when it changes
+  useEffect(() => {
+    if (originAddress) {
+      sessionStorage.setItem('ag_origin_address', originAddress)
+    }
+  }, [originAddress])
+
+  // Save destination to sessionStorage when it changes
+  useEffect(() => {
+    if (destinationCoords) {
+      sessionStorage.setItem('ag_destination_coords', JSON.stringify(destinationCoords))
+    }
+    if (destinationAddress) {
+      sessionStorage.setItem('ag_destination_address', destinationAddress)
+    }
+  }, [destinationCoords, destinationAddress])
+
+  // Effect to listen for trip acceptance
+  useEffect(() => {
+    if (!activeTripId) {
+      console.log('🔍 DEBUG: No activeTripId, skipping listener setup')
+      return
+    }
+
+    console.log('🔍 DEBUG: Setting up listener for trip', activeTripId)
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+
+    // Set up real-time listener for trip status changes
+    subscriptionRef.current = supabase
+      .channel(`trip-${activeTripId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'trips', filter: `id=eq.${activeTripId}` },
+        (payload: any) => {
+          console.log('🔍 DEBUG: Trip update received:', payload)
+          console.log('🔍 DEBUG: New status:', payload.new.status)
+          console.log('🔍 DEBUG: Expected: ASSIGNED, Got:', payload.new.status)
+          
+          if (payload.new.status === 'ASSIGNED') {
+            console.log('🎯 SUCCESS: Trip accepted!')
+            setTripAccepted(true)
+            setAcceptedDriver(payload.new.driverId || 'Motorista')
+            setWaitingSeconds(0)
+            console.log('Trip accepted!', payload.new)
+            
+            // Send notification
+            sendNotification('✓ Pedido Aceito!', {
+              body: 'Seu motorista está a caminho',
+              icon: '✓',
+              badge: '🚗',
+            })
+
+            // Start waiting timer
+            if (waitingTimerRef.current) clearInterval(waitingTimerRef.current)
+            waitingTimerRef.current = setInterval(() => {
+              setWaitingSeconds(prev => prev + 1)
+            }, 1000)
+
+            // Listen for driver location updates if driverId exists
+            if (payload.new.driverId) {
+              driverSubscriptionRef.current = supabase
+                .channel(`driver-location-${payload.new.driverId}`)
+                .on(
+                  'postgres_changes',
+                  { event: 'UPDATE', schema: 'public', table: 'drivers', filter: `id=eq.${payload.new.driverId}` },
+                  (driverPayload: any) => {
+                    if (driverPayload.new.current_lat && driverPayload.new.current_lng) {
+                      setDriverLocation({
+                        lat: driverPayload.new.current_lat,
+                        lng: driverPayload.new.current_lng,
+                      })
+                    }
+                  }
+                )
+                .subscribe()
+            }
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe()
+      }
+      if (driverSubscriptionRef.current) {
+        driverSubscriptionRef.current.unsubscribe()
+      }
+      if (waitingTimerRef.current) {
+        clearInterval(waitingTimerRef.current)
+      }
+    }
+  }, [activeTripId])
+
+  // New useEffect to update Supabase with current location for active trip
+  useEffect(() => {
+    if (activeTripId && latitude !== null && longitude !== null) {
+      const updateLocation = async () => {
+        console.log(`Updating trip ${activeTripId} location to ${latitude}, ${longitude}`);
+        const { error } = await supabase
+          .from('trips')
+          .update({ origin_lat: latitude, origin_lng: longitude })
+          .eq('id', activeTripId);
+
+        if (error) {
+          console.error('Error updating trip location:', error);
+        }
+      };
+      // Debounce the update to prevent too many writes to Supabase
+      const handler = setTimeout(() => {
+        updateLocation();
+      }, 2000); // Update every 2 seconds
+
+      return () => clearTimeout(handler); // Cleanup timeout
+    }
+  }, [latitude, longitude, activeTripId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    if (locationPermission === 'denied' && !showPermissionWarning) {
+      setShowPermissionWarning(true)
+      setLoading(false)
+      return
+    }
+
+    let finalOriginLat = latitude
+    let finalOriginLng = longitude
+    let finalDestinationLat: number | null = null
+    let finalDestinationLng: number | null = null
+    let quotedPrice: number | null = null
+    let gpsFallbackMessage: string | null = null;
+
+    // Prioritize GPS coordinates for origin
+    if (latitude === null || longitude === null) {
+      const originCoords = await geocodeAddress(originAddress)
+      if (originCoords) {
+        finalOriginLat = originCoords.lat
+        finalOriginLng = originCoords.lng
+      } else {
+        gpsFallbackMessage = 'Usando endereço digitado por falha no GPS ou geocoding da origem.';
+      }
+    }
+
+    // Use destinationCoords from map selection
+    if (destinationCoords) {
+      finalDestinationLat = destinationCoords.lat
+      finalDestinationLng = destinationCoords.lng
+    } else {
+      alert('Por favor, selecione um destino no mapa.');
+      setLoading(false);
+      return;
+    }
+
+    // Calculate price if both origin and destination coordinates are available
+    if (finalOriginLat && finalOriginLng && finalDestinationLat && finalDestinationLng) {
+      try {
+        const origin: Coordinates = { lat: finalOriginLat, lng: finalOriginLng }
+        const destination: Coordinates = { lat: finalDestinationLat, lng: finalDestinationLng }
+        const routeData = await fetchOsrmRoute(origin, destination)
+        const distanceKm = routeData.distanceMeters / 1000
+        // Rule: 500 Kz base + 300 Kz per km
+        quotedPrice = 500 + Math.round(distanceKm * 300)
+      } catch (osrmError) {
+        console.error('Error calculating route distance with OSRM:', osrmError)
+        quotedPrice = null
+      }
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('trips')
+        .insert([
+          {
+            origin_address: originAddress,
+            destination_address: destinationAddress,
+            status: 'pending',
+            service_type: serviceType,
+            origin_lat: finalOriginLat,
+            origin_lng: finalOriginLng,
+            destination_lat: finalDestinationLat,
+            destination_lng: finalDestinationLng,
+            quoted_price: quotedPrice,
+          },
+        ])
+        .select('id');
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data && data.length > 0) {
+        setActiveTripId(data[0].id);
+        localStorage.setItem('activeTripId', data[0].id);
+        setShowSummary(false);
+        setTripAccepted(false);
+        // Clear sessionStorage after successful submission
+        sessionStorage.removeItem('ag_origin_address')
+        sessionStorage.removeItem('ag_destination_coords')
+        sessionStorage.removeItem('ag_destination_address')
+      }
+
+      let successMessage = 'Pedido de viagem enviado com sucesso! Aguardando motorista.';
+      if (gpsFallbackMessage) {
+        successMessage += ` (${gpsFallbackMessage})`;
+      }
+      alert(successMessage);
+      setOriginAddress('');
+      setDestinationAddress('');
+      setServiceType('moto');
+      setShowPermissionWarning(false);
+      setGpsObtained(false);
+    } catch (err: any) {
+      alert(`Erro ao solicitar viagem: ${err.message}`);
+      setActiveTripId(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleShowSummary = (e: React.FormEvent) => {
+    e.preventDefault()
+    setShowSummary(true)
+  }
+
+  const handleBackToForm = () => {
+    setShowSummary(false)
+  }
+
+  // Show trip accepted notification with new component
+  if (tripAccepted && activeTripId) {
+    return (
+      <TripAcceptedView
+        tripId={activeTripId}
+        driverName={acceptedDriver}
+        onNewTrip={() => {
+          setShowSummary(false)
+          setTripAccepted(false)
+          setActiveTripId(null)
+          localStorage.removeItem('activeTripId')
+          setOriginAddress('')
+          setDestinationAddress(null)
+          setDestinationCoords(null)
+          setWaitingSeconds(0)
+          setDriverLocation(null)
+          // Clear sessionStorage when starting new trip
+          sessionStorage.removeItem('ag_origin_address')
+          sessionStorage.removeItem('ag_destination_coords')
+          sessionStorage.removeItem('ag_destination_address')
+          if (waitingTimerRef.current) clearInterval(waitingTimerRef.current)
+        }}
+      />
+    )
+  }
+
+  // Show summary before confirming trip
+  if (showSummary && routeData) {
+    return (
+      <form style={formStyles} onSubmit={handleSubmit}>
+        <h2 style={{ color: '#1f2937', textAlign: 'center' }}>Resumo da Viagem</h2>
+        
+        <div style={summaryStyles}>
+          <div style={summaryRowStyles}>
+            <span style={summaryLabelStyles}>Origem</span>
+            <span style={summaryValueStyles}>{originAddress.substring(0, 25)}...</span>
+          </div>
+          
+          <div style={summaryRowStyles}>
+            <span style={summaryLabelStyles}>Destino</span>
+            <span style={summaryValueStyles}>{destinationAddress?.substring(0, 25)}...</span>
+          </div>
+          
+          <div style={summaryRowStyles}>
+            <span style={summaryLabelStyles}>Serviço</span>
+            <span style={summaryValueStyles}>
+              {serviceType === 'moto' ? 'Moto-Táxi' : serviceType === 'carro' ? 'Familiar' : 'Frete'}
+            </span>
+          </div>
+
+          <div style={{ ...summaryRowStyles, borderBottom: 'none', marginTop: '5px', paddingTop: '10px', borderTop: '1px solid #e5e7eb' }}>
+            <span style={summaryLabelStyles}>Distância</span>
+            <span style={summaryValueStyles}>{routeData.distanceKm} km</span>
+          </div>
+          
+          <div style={summaryRowStyles}>
+            <span style={summaryLabelStyles}>Duração estimada</span>
+            <span style={summaryValueStyles}>{routeData.durationMin} min</span>
+          </div>
+
+          <div style={{ ...summaryRowStyles, borderBottom: 'none', marginTop: '10px', paddingTop: '10px', justifyContent: 'center' }}>
+            <span style={priceHighlightStyles}>
+              {routeData.price ? formatCurrency(routeData.price) : 'A calcular'}
+            </span>
+          </div>
+        </div>
+
+        <div style={buttonGroupStyles}>
+          <button 
+            type="button" 
+            onClick={handleBackToForm} 
+            style={buttonSecondaryStyles}
+          >
+            Voltar
+          </button>
+          <button 
+            type="submit" 
+            style={buttonStyles} 
+            disabled={loading}
+          >
+            {loading ? 'Confirmando...' : 'Confirmar Viagem'}
+          </button>
+        </div>
+      </form>
+    )
+  }
+
+  // Show initial form
+  return (
+    <form style={formStyles} onSubmit={handleShowSummary}>
+      <h2 style={{ color: '#1f2937', textAlign: 'center' }}>Solicitar Nova Viagem</h2>
+      
+      {gpsObtained && (
+        <div className="gps-obtido" style={{ marginBottom: '10px', textAlign: 'center' }}>
+          ✓ Localização GPS obtida!
+        </div>
+      )}
+      
+      {showPermissionWarning && locationPermission === 'denied' && (
+        <div style={{ color: '#F97316', marginBottom: '10px', fontSize: '14px' }}>
+          Para sua segurança, a localização exata ajuda o motorista. Deseja continuar apenas com o endereço de texto?
+          <button type="button" onClick={() => setShowPermissionWarning(false)} style={{ marginLeft: '10px', background: '#F97316', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>
+            Sim, continuar
+          </button>
+        </div>
+      )}
+
+      {!destinationCoords && (
+        <div style={{ color: '#F97316', marginBottom: '10px', textAlign: 'center', fontWeight: '500' }}>
+          ⚠ Selecione um destino no mapa
+        </div>
+      )}
+
+      {routeData && destinationCoords && (
+        <div style={{ background: '#dcfce7', padding: '10px', borderRadius: '8px', marginBottom: '10px', color: '#166534', textAlign: 'center', fontSize: '14px', border: '1px solid #bbf7d0' }}>
+          Rota calculada: {routeData.distanceKm} km · {routeData.durationMin} min · {formatCurrency(routeData.price || 0)}
+        </div>
+      )}
+      
+      <input
+        type="text"
+        placeholder="Endereço de Origem"
+        value={originAddress}
+        onChange={(e) => setOriginAddress(e.target.value)}
+        style={inputStyles}
+        required
+      />
+      
+      <input
+        type="text"
+        placeholder="Destino"
+        value={destinationAddress || ''}
+        onChange={() => {}}
+        style={inputStyles}
+        readOnly
+        required
+      />
+      
+      <select
+        value={serviceType}
+        onChange={(e) => setServiceType(e.target.value as 'moto' | 'carro' | 'caminhao')}
+        style={inputStyles}
+        required
+      >
+        <option value="moto">Moto-Táxi</option>
+        <option value="caminhao">Frete</option>
+        <option value="carro">Familiar</option>
+      </select>
+
+      <button 
+        type="submit" 
+        style={buttonStyles} 
+        disabled={loading || !destinationCoords || routeLoading}
+      >
+        {routeLoading ? 'Calculando rota...' : loading ? 'Solicitando...' : 'Próximo'}
+      </button>
+    </form>
+  )
+}

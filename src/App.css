@@ -1,0 +1,46 @@
+/* Mobile: ecrã completo + barra inferior. Desktop: site em largura total (ver media em baixo). */
+.app-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.app-shell {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+  position: relative;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 16px 16px calc(var(--nav-height) + 16px);
+  min-height: 100%;
+}
+
+/* Telefone: barra inferior; conteúdo identado como app */
+@media (max-width: 767.98px) {
+  .app-root {
+    background: #ececec;
+  }
+}
+
+/* PC / tablet largo: site, cabeçalho no topo, sem barra inferior, conteúdo centrado e largo */
+@media (min-width: 768px) {
+  .app-root {
+    background: #f0f0f0;
+  }
+
+  .app-main {
+    max-width: 1200px;
+    padding: 32px 32px 56px;
+  }
+}

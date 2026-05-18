@@ -1,0 +1,253 @@
+.document-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.document-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.document-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fafafa;
+  border-radius: 12px 12px 0 0;
+}
+
+.document-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.document-modal-content {
+  flex: 1;
+  padding: 24px;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  min-height: 300px;
+}
+
+.document-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.document-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  background: #fafafa;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-radius: 0 0 12px 12px;
+}
+
+.download-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff9558 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.download-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.close-footer-btn {
+  padding: 10px 20px;
+  background: #f8f9fa;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-footer-btn:hover {
+  background: #e9ecef;
+  color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .document-modal-backdrop {
+    padding: 16px;
+  }
+  
+  .document-modal {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+  
+  .document-modal-header {
+    padding: 16px 20px;
+  }
+  
+  .document-modal-content {
+    padding: 16px;
+    min-height: 200px;
+  }
+  
+  .document-modal-footer {
+    padding: 12px 20px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .download-btn,
+  .close-footer-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .document-modal-header {
+    padding: 12px 16px;
+  }
+  
+  .document-modal-header h3 {
+    font-size: 16px;
+  }
+  
+  .document-modal-content {
+    padding: 12px;
+  }
+  
+  .document-modal-footer {
+    padding: 12px 16px;
+  }
+}
+
+/* Loading state */
+.document-image.loading {
+  opacity: 0.5;
+  filter: blur(2px);
+}
+
+/* Zoom functionality */
+.document-modal-content.zoomed {
+  cursor: zoom-out;
+}
+
+.document-image.zoomed {
+  transform: scale(1.5);
+  cursor: zoom-out;
+}
+
+/* Accessibility */
+.document-modal-backdrop:focus {
+  outline: 2px solid #ff6b35;
+  outline-offset: 2px;
+}
+
+.close-btn:focus,
+.download-btn:focus,
+.close-footer-btn:focus {
+  outline: 2px solid #ff6b35;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .document-modal-backdrop {
+    background: white;
+  }
+  
+  .document-modal-header,
+  .document-modal-footer {
+    display: none;
+  }
+  
+  .document-modal {
+    box-shadow: none;
+    border: none;
+  }
+  
+  .document-image {
+    box-shadow: none;
+    max-width: 100%;
+    max-height: 100vh;
+  }
+}

@@ -1,0 +1,32 @@
+.tab-ph {
+  padding: 32px 8px;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .tab-ph {
+    padding: 64px 32px 80px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+}
+
+.tab-ph__title {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.tab-ph__sub {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.tab-ph__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}

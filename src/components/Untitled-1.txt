@@ -1,0 +1,3 @@
+# 
+
+{"place_id":39817984,"licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type":"way","osm_id":1237651677,"lat":"-8.8317572","lon":"13.2619645","class":"highway","type":"residential","place_rank":26,"importance":0.05340856412603948,"addresstype":"road","name":"Rua de Murtosa (Rua C10 de baixo)","display_name":"Rua de Murtosa (Rua C10 de baixo), Calemba, Bairro Nelito Soares, Luanda, Município de Luanda, Luanda, Angola","address":{"road":"Rua de Murtosa (Rua C10 de baixo)","suburb":"Calemba","city":"Luanda","county":"Município de Luanda","state":"Luanda","ISO3166-2-lvl4":"AO-LUA","country":"Angola","country_code":"ao"},"boundingbox":["-8.8322700","-8.8315108","13.2614194","13.2630988"]}

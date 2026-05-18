@@ -1,0 +1,133 @@
+.desktop-header {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktop-header {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+    box-shadow: 0 1px 0 rgba(17, 24, 39, 0.04);
+  }
+
+  .desktop-header__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .desktop-header__logo {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--primary);
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    padding: 8px 0;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .desktop-header__logo:hover {
+    opacity: 0.9;
+  }
+
+  .desktop-header__nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 8px;
+  }
+
+  .desktop-header__link {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .desktop-header__link:hover {
+    color: var(--text);
+    background: rgba(17, 24, 39, 0.04);
+  }
+
+  .desktop-header__link--active {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  .desktop-header__link--active:hover {
+    color: var(--primary);
+  }
+
+  .desktop-header__profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: var(--text-muted);
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .desktop-header__profile:hover {
+    color: var(--text);
+    background: #e5e7eb;
+  }
+
+  .desktop-header__user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .desktop-header__user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .desktop-header__logout {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+
+  .desktop-header__logout:hover {
+    background: #e65a00;
+  }
+}
