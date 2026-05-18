@@ -9,7 +9,10 @@ export default function CandidaturaPage() {
 
   const [formData, setFormData] = useState({
     full_name: '',
-    whatsapp: ''
+    whatsapp: '',
+    bi_front_url: '',
+    bi_back_url: '',
+    photo_4x4_url: ''
   })
   
   const [uploading, setUploading] = useState({
@@ -69,11 +72,7 @@ export default function CandidaturaPage() {
         .from('driver-documents')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = (progress.loaded / progress.total) * 100
-            setUploadProgress(prev => ({ ...prev, [type]: Math.round(percent) }))
-          }
+          upsert: false
         })
 
       // Verificar erro de upload imediatamente
@@ -85,14 +84,9 @@ export default function CandidaturaPage() {
       console.log(`✅ Upload ${type} concluído:`, data)
 
       // Obter URL pública do arquivo
-      const { data: urlData, error: urlError } = supabase.storage
+      const { data: urlData } = supabase.storage
         .from('driver-documents')
         .getPublicUrl(filePath)
-
-      if (urlError) {
-        console.error(`❌ Erro ao obter URL ${type}:`, urlError)
-        throw new Error(`Falha ao obter URL do ${type}: ${urlError.message}`)
-      }
 
       if (!urlData?.publicUrl) {
         console.error(`❌ URL inválida para ${type}:`, urlData)
@@ -295,7 +289,10 @@ export default function CandidaturaPage() {
       // Limpar formulário
       setFormData({
         full_name: '',
-        whatsapp: ''
+        whatsapp: '',
+        bi_front_url: '',
+        bi_back_url: '',
+        photo_4x4_url: ''
       })
       
       // Limpar previews

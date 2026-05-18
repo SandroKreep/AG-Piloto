@@ -70,11 +70,7 @@ export default function DriverApplicationForm() {
         .from('driver-documents')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = (progress.loaded / progress.total) * 100
-            setUploadProgress(prev => ({ ...prev, [type]: Math.round(percent) }))
-          }
+          upsert: false
         })
 
       if (error) {

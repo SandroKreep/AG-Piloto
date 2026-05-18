@@ -3,6 +3,7 @@ import './HomeView.css'
 import TripMap from './TripMap'
 import TripRequestForm from './TripRequestForm'
 import type { Coordinates } from '../services/osrm'
+import { fetchOsrmRoute } from '../services/osrm'
 
 type ServiceItem = {
   title: string
@@ -128,7 +129,7 @@ export default function HomeView({ onGoDriver }: Props) {
       const getRoute = async () => {
         try {
           const routeData = await fetchOsrmRoute(originCoords, destinationCoords)
-          setRoute(routeData.coordinates)
+          setRoute(routeData.geometry)
           setStats({ distanceKm: routeData.distanceMeters / 1000, durationMin: routeData.durationSeconds / 60 })
         } catch (error) {
           console.error('Error fetching route:', error)

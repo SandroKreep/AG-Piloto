@@ -165,7 +165,7 @@ export default function TripRequestForm({
 
   const watchId = useRef<number | null>(null)
   const subscriptionRef = useRef<any>(null)
-  const waitingTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const waitingTimerRef = useRef<number | null>(null)
   const driverSubscriptionRef = useRef<any>(null)
 
   useEffect(() => {

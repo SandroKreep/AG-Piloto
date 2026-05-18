@@ -184,6 +184,8 @@ type Props = {
   setDestinationAddress: (address: string | null) => void
   originCoords: Coordinates | null
   setOriginCoords: (coords: Coordinates | null) => void
+  route: Array<[number, number]>
+  stats: { distanceKm: number; durationMin: number } | null
 }
 
 type Trip = {
@@ -298,7 +300,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
       fetchOsrmRoute(pickupCoords, dropoffCoords)
         .then((data) => {
           if (!isActive) return
-          const newRoute = data.geometry.map(([lng, lat]) => [lat, lng]);
+          const newRoute = data.geometry.map(([lng, lat]) => [lat, lng] as [number, number]);
           setRoute(newRoute)
           setStats({
             distanceKm: Number((data.distanceMeters / 1000).toFixed(2)),
@@ -359,7 +361,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
     fetchOsrmRoute(pickupCoords, dropoffCoords)
       .then((data) => {
         if (!isActive) return
-        const newRoute = data.geometry.map(([lng, lat]) => [lat, lng]);
+        const newRoute = data.geometry.map(([lng, lat]) => [lat, lng] as [number, number]);
         setRoute(newRoute)
         setStats({
           distanceKm: Number((data.distanceMeters / 1000).toFixed(2)),

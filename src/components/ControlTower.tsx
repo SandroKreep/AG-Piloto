@@ -44,6 +44,7 @@ export type Trip = {
 }
 
 type VehicleType = 'taxi' | 'familiar' | 'frete'
+type MarkerType = VehicleType | 'origin' | 'destination'
 
 export type VehicleLive = {
   id: string
@@ -249,7 +250,7 @@ function ControlTower({ vehicles }: Props) {
           return
         }
 
-        const newRoute = data.geometry.map(([lng, lat]) => [lat, lng])
+        const newRoute = data.geometry.map(([lng, lat]) => [lat, lng] as [number, number])
         setRoute(newRoute)
 
         if (mapRef.current && newRoute.length > 0) {
@@ -436,7 +437,13 @@ function ControlTower({ vehicles }: Props) {
   }, [vehicles, selectedTrip])
 
   const markers = useMemo(() => {
-    let allMarkers = vehicles
+    let allMarkers: Array<{
+      id: string
+      position: L.LatLngExpression
+      icon: L.DivIcon
+      label: string
+      type: MarkerType
+    }> = vehicles
       .filter((vehicle) => isValidLuandaCoordinate(vehicle.lat, vehicle.lng))
       .map((vehicle) => ({
         id: vehicle.id,

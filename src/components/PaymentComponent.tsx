@@ -99,9 +99,9 @@ export default function PaymentComponent({
 
       // Processar pagamento baseado no método
       if (selectedMethod === 'WALLET') {
-        await processWalletPayment(paymentData.data.id, user.session?.access_token)
+        await processWalletPayment(paymentData.data.id, session.access_token)
       } else if (selectedMethod === 'CASH') {
-        await processCashPayment(paymentData.data.id, user.session?.access_token)
+        await processCashPayment(paymentData.data.id, session.access_token)
       } else {
         // Para cartão e dinheiro móvel, mostrar formulário de pagamento
         setShowPaymentForm(true)
