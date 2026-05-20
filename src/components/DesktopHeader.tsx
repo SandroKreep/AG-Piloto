@@ -66,7 +66,10 @@ export default function DesktopHeader({ active, onChange }: Props) {
           <button
             type="button"
             className="desktop-header__profile"
-            onClick={() => onChange('profile')}
+            onClick={() => {
+              const { setShowAuthModal } = useAuthStore.getState()
+              setShowAuthModal(true)
+            }}
             aria-label="Perfil"
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">

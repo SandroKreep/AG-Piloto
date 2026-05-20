@@ -90,6 +90,12 @@ export default function BottomNav({ active, onChange }: Props) {
       addToast('Esta funcionalidade estará disponível em breve.', 'info')
       return
     }
+    // If clicking profile tab and user is not logged in, open auth modal
+    if (t.id === 'profile' && !user) {
+      const { setShowAuthModal } = useAuthStore.getState()
+      setShowAuthModal(true)
+      return
+    }
     onChange(t.id)
   }
 

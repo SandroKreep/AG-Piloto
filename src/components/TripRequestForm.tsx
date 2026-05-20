@@ -152,6 +152,7 @@ export default function TripRequestForm({
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt')
   const [showPermissionWarning, setShowPermissionWarning] = useState(false)
   const [gpsObtained, setGpsObtained] = useState(false)
+  const [isGeocoding, setIsGeocoding] = useState(false)
   const [activeTripId, setActiveTripId] = useState<string | null>(null)
   
   // New states for route summary
@@ -162,16 +163,57 @@ export default function TripRequestForm({
   const [acceptedDriver, setAcceptedDriver] = useState<string | null>(null)
   const [waitingSeconds, setWaitingSeconds] = useState(0)
   const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null)
+  
+  // Autocomplete states for destination
+  const [destinoTexto, setDestinoTexto] = useState('')
+  const [sugestoes, setSugestoes] = useState<any[]>([])
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false)
+  const debounceRef = useRef<any>(null)
 
   const watchId = useRef<number | null>(null)
   const subscriptionRef = useRef<any>(null)
   const waitingTimerRef = useRef<number | null>(null)
   const driverSubscriptionRef = useRef<any>(null)
+  const geocodingDone = useRef(false)
+
+  const buscarSugestoes = (texto: string) => {
+    setDestinoTexto(texto)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (texto.length < 3) {
+      setSugestoes([])
+      setMostrarSugestoes(false)
+      return
+    }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto + ' Luanda Angola')}&format=json&limit=5&countrycodes=ao&accept-language=pt`,
+          { headers: { 'User-Agent': 'AG-PILOTO/1.0' } }
+        )
+        const data = await res.json()
+        setSugestoes(data)
+        setMostrarSugestoes(true)
+      } catch (err) {
+        console.error('Erro autocomplete:', err)
+      }
+    }, 800)
+  }
+
+  const selecionarSugestao = (s: any) => {
+    setDestinoTexto(s.display_name)
+    setSugestoes([])
+    setMostrarSugestoes(false)
+    // Actualiza o destino no mapa
+    const lat = parseFloat(s.lat)
+    const lng = parseFloat(s.lon)
+    setDestinationCoords({ lat, lng })
+    setDestinationAddress(s.display_name)
+  }
 
   useEffect(() => {
     if ('geolocation' in navigator) {
       watchId.current = navigator.geolocation.watchPosition(
-        async (position) => {
+        (position) => {
           const currentLat = position.coords.latitude;
           const currentLng = position.coords.longitude;
           setLatitude(currentLat);
@@ -179,13 +221,6 @@ export default function TripRequestForm({
           setLocationPermission('granted');
           setGpsObtained(true);
           console.log('Enviando GPS:', currentLat, currentLng);
-
-          const address = await reverseGeocodeCoordinates(currentLat, currentLng);
-          if (address) {
-            setOriginAddress(address);
-          } else {
-            console.warn('Não foi possível reverter o geocoding da localização actual.');
-          }
         },
         (error) => {
           console.error('Error getting location:', error)
@@ -206,6 +241,18 @@ export default function TripRequestForm({
       }
     }
   }, [])
+
+  // Effect to perform reverse geocoding only once after GPS returns
+  useEffect(() => {
+    if (latitude && longitude && !geocodingDone.current) {
+      geocodingDone.current = true
+      setIsGeocoding(true)
+      reverseGeocodeCoordinates(latitude, longitude).then((address) => {
+        setOriginAddress(address)
+        setIsGeocoding(false)
+      })
+    }
+  }, [latitude, longitude])
 
   // Effect to calculate route when origin and destination change
   useEffect(() => {
@@ -254,6 +301,8 @@ export default function TripRequestForm({
     }
     if (destinationAddress) {
       sessionStorage.setItem('ag_destination_address', destinationAddress)
+      // Sync destinoTexto with destinationAddress when changed externally
+      setDestinoTexto(destinationAddress)
     }
   }, [destinationCoords, destinationAddress])
 
@@ -595,22 +644,42 @@ export default function TripRequestForm({
       
       <input
         type="text"
-        placeholder="Endereço de Origem"
+        placeholder={originAddress ? originAddress : gpsObtained ? 'A obter endereço...' : 'Endereço de Origem'}
         value={originAddress}
         onChange={(e) => setOriginAddress(e.target.value)}
         style={inputStyles}
         required
       />
       
-      <input
-        type="text"
-        placeholder="Destino"
-        value={destinationAddress || ''}
-        onChange={() => {}}
-        style={inputStyles}
-        readOnly
-        required
-      />
+      <div style={{ position: 'relative' }}>
+        <input
+          type="text"
+          value={destinoTexto}
+          onChange={(e) => buscarSugestoes(e.target.value)}
+          placeholder="Escreve o destino..."
+          style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white', color: '#1f2937', fontSize: '16px', outline: 'none', transition: 'border-color 0.2s' }}
+        />
+        {mostrarSugestoes && sugestoes.length > 0 && (
+          <div style={{
+            position: 'absolute', top: '100%', left: 0, right: 0,
+            background: 'white', border: '1px solid #ddd', borderRadius: '8px',
+            zIndex: 1000, maxHeight: '200px', overflowY: 'auto',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+          }}>
+            {sugestoes.map((s) => (
+              <div
+                key={s.place_id}
+                onClick={() => selecionarSugestao(s)}
+                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+              >
+                📍 {s.display_name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       
       <select
         value={serviceType}

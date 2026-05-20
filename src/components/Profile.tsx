@@ -169,6 +169,10 @@ export default function Profile() {
     }
   }
 
+  if (!user) {
+    return null
+  }
+
   if (loading) {
     return (
       <div className="profile">

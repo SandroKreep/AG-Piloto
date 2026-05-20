@@ -12,19 +12,17 @@ export function isValidLuandaCoordinate(latitude: number, longitude: number): bo
   return latitude >= minLat && latitude <= maxLat && longitude >= minLon && longitude <= maxLon;
 }
 
-export async function reverseGeocodeCoordinates(lat: number, lng: number): Promise<string | null> {
+export async function reverseGeocodeCoordinates(lat: number, lng: number): Promise<string> {
   try {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&accept-language=pt`,
       { headers: { 'User-Agent': 'AG-PILOTO/1.0' } }
     );
     const data = await response.json();
-    if (data && data.display_name) {
-      return data.display_name;
-    }
-    return null;
+    const nome = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    return nome;
   } catch (error) {
     console.error('Error reverse geocoding coordinates:', error);
-    return null;
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
   }
 }
