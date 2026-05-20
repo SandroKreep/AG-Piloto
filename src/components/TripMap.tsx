@@ -137,6 +137,7 @@ function MyLocationMarker({ activeTripId, setOriginCoords }: { activeTripId: str
   const [position, setPosition] = useState<L.LatLngExpression | null>(null)
   const [showLocationWarning, setShowLocationWarning] = useState(false) // New state for warning
   const map = useMap()
+  const mapCentradoRef = useRef(false)
 
   useEffect(() => {
     if (!('geolocation' in navigator)) {
@@ -158,7 +159,12 @@ function MyLocationMarker({ activeTripId, setOriginCoords }: { activeTripId: str
         const newPos: L.LatLngExpression = [latitude, longitude]
         setPosition(newPos)
         setOriginCoords({ lat: latitude, lng: longitude }); // Update origin in parent
-        map.flyTo(newPos, map.getZoom())
+
+        // Only center map on first GPS position
+        if (!mapCentradoRef.current) {
+          map.setView([latitude, longitude], 15)
+          mapCentradoRef.current = true
+        }
 
         if (activeTripId) {
           const { error } = await supabase
