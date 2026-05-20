@@ -176,6 +176,8 @@ export default function TripRequestForm({
   const waitingTimerRef = useRef<number | null>(null)
   const driverSubscriptionRef = useRef<any>(null)
   const geocodingDone = useRef(false)
+  const destinoFixo = useRef(false)
+  const originCoords = useRef<{ lat: number; lng: number } | null>(null)
 
   const buscarSugestoes = (texto: string) => {
     setDestinoTexto(texto)
@@ -188,7 +190,7 @@ export default function TripRequestForm({
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto + ' Luanda Angola')}&format=json&limit=5&countrycodes=ao&accept-language=pt`,
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto + ' Luanda Angola')}&format=json&limit=10&countrycodes=ao&accept-language=pt&addressdetails=1`,
           { headers: { 'User-Agent': 'AG-PILOTO/1.0' } }
         )
         const data = await res.json()
@@ -207,6 +209,14 @@ export default function TripRequestForm({
     // Actualiza o destino no mapa
     const lat = parseFloat(s.lat)
     const lng = parseFloat(s.lon)
+    
+    // Bloqueia actualizações GPS e limpa watch
+    destinoFixo.current = true
+    if (watchId.current !== null) {
+      navigator.geolocation.clearWatch(watchId.current)
+      watchId.current = null
+    }
+    
     setDestinationCoords({ lat, lng })
     setDestinationAddress(s.display_name)
   }
@@ -217,11 +227,16 @@ export default function TripRequestForm({
         (position) => {
           const currentLat = position.coords.latitude;
           const currentLng = position.coords.longitude;
-          setLatitude(currentLat);
-          setLongitude(currentLng);
-          setLocationPermission('granted');
-          setGpsObtained(true);
-          console.log('Enviando GPS:', currentLat, currentLng);
+          
+          // Só actualiza origem se ainda não escolheu destino
+          if (!destinoFixo.current) {
+            setLatitude(currentLat);
+            setLongitude(currentLng);
+            originCoords.current = { lat: currentLat, lng: currentLng };
+            setLocationPermission('granted');
+            setGpsObtained(true);
+            console.log('Enviando GPS:', currentLat, currentLng);
+          }
         },
         (error) => {
           console.error('Error getting location:', error)
@@ -255,17 +270,21 @@ export default function TripRequestForm({
     }
   }, [latitude, longitude])
 
-  // Effect to calculate route when origin and destination change
+  // Effect to calculate route when destination changes (not GPS)
   useEffect(() => {
     const calculateRoute = async () => {
-      if (!latitude || !longitude || !destinationCoords) {
+      // Usa as coordenadas de origem fixas ou actuais
+      const originLat = originCoords.current?.lat || latitude
+      const originLng = originCoords.current?.lng || longitude
+      
+      if (!originLat || !originLng || !destinationCoords) {
         setRouteData(null)
         return
       }
 
       setRouteLoading(true)
       try {
-        const origin: Coordinates = { lat: latitude, lng: longitude }
+        const origin: Coordinates = { lat: originLat, lng: originLng }
         const routeInfo = await fetchOsrmRoute(origin, destinationCoords)
         const distanceKm = routeInfo.distanceMeters / 1000
         const durationMin = routeInfo.durationSeconds / 60
@@ -286,7 +305,7 @@ export default function TripRequestForm({
     }
 
     calculateRoute()
-  }, [latitude, longitude, destinationCoords])
+  }, [destinationCoords])
 
   // Save originAddress to sessionStorage when it changes
   useEffect(() => {
@@ -299,6 +318,15 @@ export default function TripRequestForm({
   useEffect(() => {
     if (destinationCoords) {
       sessionStorage.setItem('ag_destination_coords', JSON.stringify(destinationCoords))
+      
+      // Bloqueia GPS e limpa watch quando destino é seleccionado no mapa
+      if (!destinoFixo.current) {
+        destinoFixo.current = true
+        if (watchId.current !== null) {
+          navigator.geolocation.clearWatch(watchId.current)
+          watchId.current = null
+        }
+      }
     }
     if (destinationAddress) {
       sessionStorage.setItem('ag_destination_address', destinationAddress)
@@ -540,6 +568,9 @@ export default function TripRequestForm({
           setDestinationCoords(null)
           setWaitingSeconds(0)
           setDriverLocation(null)
+          // Reset GPS flag and coords for new trip
+          destinoFixo.current = false
+          originCoords.current = null
           // Clear sessionStorage when starting new trip
           sessionStorage.removeItem('ag_origin_address')
           sessionStorage.removeItem('ag_destination_coords')
@@ -664,7 +695,7 @@ export default function TripRequestForm({
           <div style={{
             position: 'absolute', top: '100%', left: 0, right: 0,
             background: 'white', border: '1px solid #ddd', borderRadius: '8px',
-            zIndex: 1000, maxHeight: '200px', overflowY: 'auto',
+            zIndex: 1000, maxHeight: '300px', overflowY: 'auto',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
           }}>
             {sugestoes.map((s) => (
