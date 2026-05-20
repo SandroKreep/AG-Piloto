@@ -54,14 +54,22 @@ function MapClickHandler({
   setDestinationCoords,
   setDestinationAddress,
   setShowLocationWarning,
+  destinationMarkerRef,
+  routeLayerRef,
+  setRoute,
+  setStats,
 }: {
   setDestinationCoords: (coords: Coordinates | null) => void
   setDestinationAddress: (address: string | null) => void
   setShowLocationWarning: (show: boolean) => void
+  destinationMarkerRef: React.MutableRefObject<L.Marker | null>
+  routeLayerRef: React.MutableRefObject<L.Polyline | null>
+  setRoute: (route: Array<[number, number]>) => void
+  setStats: (stats: { distanceKm: number; durationMin: number } | null) => void
 }) {
   const map = useMap();
   const { user, setShowAuthModal } = useAuthStore();
-  
+
   useEffect(() => {
     const onClick = async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
@@ -72,6 +80,22 @@ function MapClickHandler({
         setDestinationAddress(null);
         return;
       }
+
+      // Remove marcador anterior se existir
+      if (destinationMarkerRef.current) {
+        destinationMarkerRef.current.remove();
+        destinationMarkerRef.current = null;
+      }
+
+      // Limpa rota anterior
+      if (routeLayerRef.current) {
+        routeLayerRef.current.remove();
+        routeLayerRef.current = null;
+      }
+
+      // Limpa estados anteriores
+      setRoute([])
+      setStats(null)
 
       // Check if user is logged in
       if (!user) {
@@ -105,7 +129,7 @@ function MapClickHandler({
     return () => {
       map.off('click', onClick);
     };
-  }, [map, setDestinationCoords, setDestinationAddress, setShowLocationWarning, user, setShowAuthModal]);
+  }, [map, setDestinationCoords, setDestinationAddress, setShowLocationWarning, user, setShowAuthModal, destinationMarkerRef, routeLayerRef, setRoute, setStats]);
   return null;
 }
 
@@ -221,6 +245,8 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
   const [showLocationWarning, setShowLocationWarning] = useState(false) // State for 'Destino fora da área de atuação'
 
   const mapRef = useRef<L.Map>(null); // Add map ref
+  const destinationMarkerRef = useRef<L.Marker | null>(null);
+  const routeLayerRef = useRef<L.Polyline | null>(null);
 
   const center = useMemo<[number, number]>(
     () => {
@@ -391,6 +417,65 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
     }
   }, [activeTrip])
 
+  // Effect to manage destination marker imperatively
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Remove existing marker
+    if (destinationMarkerRef.current) {
+      destinationMarkerRef.current.remove();
+      destinationMarkerRef.current = null;
+    }
+
+    // Add new marker if destination exists
+    if (destinationCoords) {
+      const marker = L.marker([destinationCoords.lat, destinationCoords.lng], {
+        icon: iconeDestino
+      }).addTo(mapRef.current);
+
+      if (destinationAddress) {
+        marker.bindPopup(destinationAddress);
+      }
+
+      destinationMarkerRef.current = marker;
+    }
+
+    return () => {
+      if (destinationMarkerRef.current) {
+        destinationMarkerRef.current.remove();
+        destinationMarkerRef.current = null;
+      }
+    };
+  }, [destinationCoords, destinationAddress]);
+
+  // Effect to manage route layer imperatively
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Remove existing route
+    if (routeLayerRef.current) {
+      routeLayerRef.current.remove();
+      routeLayerRef.current = null;
+    }
+
+    // Add new route if route exists
+    if (route.length > 0) {
+      const polyline = L.polyline(route, {
+        color: '#007bff',
+        weight: 5
+      }).addTo(mapRef.current);
+
+      routeLayerRef.current = polyline;
+    }
+
+    return () => {
+      if (routeLayerRef.current) {
+        routeLayerRef.current.remove();
+        routeLayerRef.current = null;
+      }
+    };
+  }, [route]);
+
   return (
     <section className="trip-map" aria-label="Mapa de rota com Leaflet">
         <MapContainer ref={mapRef} center={center} zoom={13} scrollWheelZoom={false} className="trip-map__canvas">
@@ -398,6 +483,10 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
             setDestinationCoords={setDestinationCoords}
             setDestinationAddress={setDestinationAddress}
             setShowLocationWarning={setShowLocationWarning}
+            destinationMarkerRef={destinationMarkerRef}
+            routeLayerRef={routeLayerRef}
+            setRoute={setRoute}
+            setStats={setStats}
           />
           {showLocationWarning && (
             <div
@@ -451,14 +540,6 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
           <MyLocationMarker activeTripId={activeTripId} setOriginCoords={setOriginCoords} />
           {activeTrip && activeTrip.status === 'accepted' && activeTripId && (
             <DriverTracking driverId={activeTrip.driver_id || null} tripId={activeTripId} />
-          )}
-          {destinationCoords && (
-            <Marker position={[destinationCoords.lat, destinationCoords.lng]} icon={iconeDestino}>
-              <Popup>{destinationAddress}</Popup>
-            </Marker>
-          )}
-          {route.length > 0 && (
-            <Polyline pathOptions={{ color: '#007bff', weight: 5 }} positions={route} />
           )}
         </MapContainer>
         <div className="trip-map__meta">
