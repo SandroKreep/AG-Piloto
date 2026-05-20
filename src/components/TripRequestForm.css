@@ -187,13 +187,55 @@
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .trip-form {
     padding: 15px;
     max-width: 100%;
+    margin: 10px;
+    border-radius: 12px;
   }
   
   .trip-form__summary {
     font-size: 14px;
+    padding: 12px;
+  }
+  
+  .trip-form__info {
+    padding: 12px;
+  }
+  
+  .trip-form__notification {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-form {
+    padding: 12px;
+    margin: 8px;
+    border-radius: 8px;
+  }
+  
+  .trip-form__summary {
+    font-size: 13px;
+    padding: 10px;
+  }
+  
+  .trip-form__info {
+    padding: 10px;
+  }
+  
+  .trip-form__info-row {
+    font-size: 13px;
+  }
+  
+  .trip-form__notification {
+    padding: 10px;
+    font-size: 13px;
+  }
+  
+  .trip-form__status {
+    font-size: 16px;
   }
 }

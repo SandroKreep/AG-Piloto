@@ -24,8 +24,9 @@ export default function TripHistoryWrapper() {
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        padding: '40px',
-        color: '#666'
+        padding: 'clamp(20px, 5vw, 40px)',
+        color: '#666',
+        fontSize: 'clamp(14px, 2.5vw, 16px)'
       }}>
         A carregar histórico...
       </div>
@@ -38,8 +39,9 @@ export default function TripHistoryWrapper() {
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center', 
-        padding: '40px',
-        color: '#666'
+        padding: 'clamp(20px, 5vw, 40px)',
+        color: '#666',
+        fontSize: 'clamp(14px, 2.5vw, 16px)'
       }}>
         Faça login para ver seu histórico
       </div>

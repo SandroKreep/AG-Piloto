@@ -25,8 +25,9 @@ const formStyles: React.CSSProperties = {
   backgroundColor: 'white',
   boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12)',
   border: 'none',
-  maxWidth: '400px',
+  maxWidth: 'min(400px, 95vw)',
   margin: '20px auto',
+  width: '100%',
 }
 
 const inputStyles: React.CSSProperties = {
@@ -552,7 +553,7 @@ export default function TripRequestForm({
   // Show summary before confirming trip
   if (showSummary && routeData) {
     return (
-      <form style={formStyles} onSubmit={handleSubmit}>
+      <form style={formStyles} className="trip-form" onSubmit={handleSubmit}>
         <h2 style={{ color: '#1f2937', textAlign: 'center' }}>Resumo da Viagem</h2>
         
         <div style={summaryStyles}>
@@ -612,7 +613,7 @@ export default function TripRequestForm({
 
   // Show initial form
   return (
-    <form style={formStyles} onSubmit={handleShowSummary}>
+    <form style={formStyles} className="trip-form" onSubmit={handleShowSummary}>
       <h2 style={{ color: '#1f2937', textAlign: 'center' }}>Solicitar Nova Viagem</h2>
       
       {gpsObtained && (
