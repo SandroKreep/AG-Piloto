@@ -137,11 +137,15 @@ export default function TripRequestForm({
   setDestinationCoords,
   destinationAddress,
   setDestinationAddress,
+  originCoords,
+  setOriginCoords,
 }: {
   destinationCoords: Coordinates | null
   setDestinationCoords: (coords: Coordinates | null) => void
   destinationAddress: string | null
   setDestinationAddress: (address: string | null) => void
+  originCoords: Coordinates | null
+  setOriginCoords: (coords: Coordinates | null) => void
 }) {
   const [originAddress, setOriginAddress] = useState(() => {
     return sessionStorage.getItem('ag_origin_address') || ''
@@ -171,13 +175,23 @@ export default function TripRequestForm({
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false)
   const debounceRef = useRef<any>(null)
 
+  // Autocomplete states for origin
+  const [originSuggestions, setOriginSuggestions] = useState<any[]>([])
+  const [showOriginSuggestions, setShowOriginSuggestions] = useState(false)
+  const [originSearchLoading, setOriginSearchLoading] = useState(false)
+  const [userEditedOrigin, setUserEditedOrigin] = useState(false)
+  const originDebounceRef = useRef<any>(null)
+  const originInputRef = useRef<HTMLInputElement>(null)
+  const originContainerRef = useRef<HTMLDivElement>(null)
+
   const watchId = useRef<number | null>(null)
   const subscriptionRef = useRef<any>(null)
   const waitingTimerRef = useRef<number | null>(null)
   const driverSubscriptionRef = useRef<any>(null)
   const geocodingDone = useRef(false)
-  const destinoFixo = useRef(false)
-  const originCoords = useRef<{ lat: number; lng: number } | null>(null)
+  const destinoFixo = useRef(sessionStorage.getItem('ag_destination_coords') !== null)
+  const originCoordsRef = useRef<{ lat: number; lng: number } | null>(null)
+  const originFixed = useRef(sessionStorage.getItem('ag_origin_coords') !== null)
 
   const buscarSugestoes = (texto: string) => {
     setDestinoTexto(texto)
@@ -221,6 +235,59 @@ export default function TripRequestForm({
     setDestinationAddress(s.display_name)
   }
 
+  const buscarSugestoesOrigem = (texto: string) => {
+    setUserEditedOrigin(true)
+    if (originDebounceRef.current) clearTimeout(originDebounceRef.current)
+    if (texto.length < 3) {
+      setOriginSuggestions([])
+      setShowOriginSuggestions(false)
+      return
+    }
+    setOriginSearchLoading(true)
+    originDebounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto)}&format=json&addressdetails=1&limit=5&countrycodes=ao`,
+          { headers: { 'User-Agent': 'ag-piloto-app/1.0' } }
+        )
+        const data = await res.json()
+        setOriginSuggestions(data)
+        setShowOriginSuggestions(true)
+      } catch (err) {
+        console.error('Erro autocomplete origem:', err)
+      } finally {
+        setOriginSearchLoading(false)
+      }
+    }, 400)
+  }
+
+  const selecionarSugestaoOrigem = (s: any) => {
+    setOriginAddress(s.display_name)
+    setOriginSuggestions([])
+    setShowOriginSuggestions(false)
+    // Actualiza a origem no mapa
+    const lat = parseFloat(s.lat)
+    const lng = parseFloat(s.lon)
+    
+    // Bloqueia actualizações GPS e limpa watch
+    originFixed.current = true
+    if (watchId.current !== null) {
+      navigator.geolocation.clearWatch(watchId.current)
+      watchId.current = null
+    }
+    
+    setLatitude(lat)
+    setLongitude(lng)
+    originCoordsRef.current = { lat, lng }
+    setOriginCoords({ lat, lng })
+    
+    // Guarda coordenadas de origem no sessionStorage
+    sessionStorage.setItem('ag_origin_coords', JSON.stringify({ lat, lng }))
+    
+    // Recalcula a rota directamente com as coordenadas escolhidas
+    calcularRota({ lat, lng }, destinationCoords || undefined)
+  }
+
   useEffect(() => {
     if ('geolocation' in navigator) {
       watchId.current = navigator.geolocation.watchPosition(
@@ -228,11 +295,12 @@ export default function TripRequestForm({
           const currentLat = position.coords.latitude;
           const currentLng = position.coords.longitude;
           
-          // Só actualiza origem se ainda não escolheu destino
-          if (!destinoFixo.current) {
+          // Só actualiza origem se ainda não escolheu destino e não fixou origem manualmente
+          if (!destinoFixo.current && !originFixed.current) {
             setLatitude(currentLat);
             setLongitude(currentLng);
-            originCoords.current = { lat: currentLat, lng: currentLng };
+            originCoordsRef.current = { lat: currentLat, lng: currentLng };
+            setOriginCoords({ lat: currentLat, lng: currentLng });
             setLocationPermission('granted');
             setGpsObtained(true);
             console.log('Enviando GPS:', currentLat, currentLng);
@@ -270,42 +338,41 @@ export default function TripRequestForm({
     }
   }, [latitude, longitude])
 
-  // Effect to calculate route when destination changes (not GPS)
-  useEffect(() => {
-    const calculateRoute = async () => {
-      // Usa as coordenadas de origem fixas ou actuais
-      const originLat = originCoords.current?.lat || latitude
-      const originLng = originCoords.current?.lng || longitude
-      
-      if (!originLat || !originLng || !destinationCoords) {
-        setRouteData(null)
-        return
-      }
-
-      setRouteLoading(true)
-      try {
-        const origin: Coordinates = { lat: originLat, lng: originLng }
-        const routeInfo = await fetchOsrmRoute(origin, destinationCoords)
-        const distanceKm = routeInfo.distanceMeters / 1000
-        const durationMin = routeInfo.durationSeconds / 60
-        // Rule: 500 Kz base + 300 Kz per km
-        const price = 500 + Math.round(distanceKm * 300)
-
-        setRouteData({
-          distanceKm: Number(distanceKm.toFixed(2)),
-          durationMin: Number(durationMin.toFixed(1)),
-          price,
-        })
-      } catch (error) {
-        console.error('Error calculating route:', error)
-        setRouteData(null)
-      } finally {
-        setRouteLoading(false)
-      }
+  // Reusable route calculation function
+  const calcularRota = async (origem?: Coordinates, destino?: Coordinates) => {
+    const origin = origem || originCoords || originCoordsRef.current || (latitude && longitude ? { lat: latitude, lng: longitude } : null)
+    const dest = destino || destinationCoords
+    
+    if (!origin || !dest) {
+      setRouteData(null)
+      return
     }
 
-    calculateRoute()
-  }, [destinationCoords])
+    setRouteLoading(true)
+    try {
+      const routeInfo = await fetchOsrmRoute(origin, dest)
+      const distanceKm = routeInfo.distanceMeters / 1000
+      const durationMin = routeInfo.durationSeconds / 60
+      // Rule: 500 Kz base + 300 Kz per km
+      const price = 500 + Math.round(distanceKm * 300)
+
+      setRouteData({
+        distanceKm: Number(distanceKm.toFixed(2)),
+        durationMin: Number(durationMin.toFixed(1)),
+        price,
+      })
+    } catch (error) {
+      console.error('Error calculating route:', error)
+      setRouteData(null)
+    } finally {
+      setRouteLoading(false)
+    }
+  }
+
+  // Effect to calculate route when destination changes (not GPS)
+  useEffect(() => {
+    calcularRota()
+  }, [destinationCoords, originCoords])
 
   // Save originAddress to sessionStorage when it changes
   useEffect(() => {
@@ -334,6 +401,20 @@ export default function TripRequestForm({
       setDestinoTexto(destinationAddress)
     }
   }, [destinationCoords, destinationAddress])
+
+  // Effect to close origin suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (originContainerRef.current && !originContainerRef.current.contains(event.target as Node)) {
+        setShowOriginSuggestions(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   // Effect to listen for trip acceptance
   useEffect(() => {
@@ -570,7 +651,13 @@ export default function TripRequestForm({
           setDriverLocation(null)
           // Reset GPS flag and coords for new trip
           destinoFixo.current = false
-          originCoords.current = null
+          originCoordsRef.current = null
+          originFixed.current = false
+          // Reset origin autocomplete states
+          setOriginSuggestions([])
+          setShowOriginSuggestions(false)
+          setOriginSearchLoading(false)
+          setUserEditedOrigin(false)
           // Clear sessionStorage when starting new trip
           sessionStorage.removeItem('ag_origin_address')
           sessionStorage.removeItem('ag_destination_coords')
@@ -674,14 +761,59 @@ export default function TripRequestForm({
         </div>
       )}
       
-      <input
-        type="text"
-        placeholder={originAddress ? originAddress : gpsObtained ? 'A obter endereço...' : 'Endereço de Origem'}
-        value={originAddress}
-        onChange={(e) => setOriginAddress(e.target.value)}
-        style={inputStyles}
-        required
-      />
+      <div style={{ position: 'relative' }} ref={originContainerRef}>
+        <input
+          ref={originInputRef}
+          type="text"
+          placeholder={originAddress ? originAddress : gpsObtained ? 'A obter endereço...' : 'Endereço de Origem'}
+          value={originAddress}
+          onChange={(e) => {
+            setOriginAddress(e.target.value)
+            buscarSugestoesOrigem(e.target.value)
+          }}
+          style={{ ...inputStyles, paddingRight: originSearchLoading ? '40px' : '10px' }}
+          required
+        />
+        {originSearchLoading && (
+          <div style={{
+            position: 'absolute',
+            right: '10px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            fontSize: '16px'
+          }}>
+            ⏳
+          </div>
+        )}
+        {showOriginSuggestions && originSuggestions.length > 0 && (
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: 'white',
+            border: '1px solid #ddd',
+            borderRadius: '8px',
+            zIndex: 1000,
+            maxHeight: '300px',
+            overflowY: 'auto',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            marginTop: '4px'
+          }}>
+            {originSuggestions.map((s) => (
+              <div
+                key={s.place_id}
+                onClick={() => selecionarSugestaoOrigem(s)}
+                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+              >
+                📍 {s.display_name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       
       <div style={{ position: 'relative' }}>
         <input

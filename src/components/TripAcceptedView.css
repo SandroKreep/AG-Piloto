@@ -7,6 +7,7 @@
   max-width: 400px;
   margin: 20px auto;
   animation: slideInUp 0.5s ease-out;
+  overflow: hidden;
 }
 
 @keyframes slideInUp {
@@ -21,35 +22,55 @@
 }
 
 .trip-accepted-header {
+  position: relative;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
   margin-bottom: 24px;
+  padding-right: 48px;
+}
+
+.trip-accepted-info {
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+  padding-left: 48px;
 }
 
 .trip-accepted-info h2 {
   margin: 0 0 8px 0;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 600;
+  text-align: center;
+  width: 100%;
+}
+
+.pulse-animation {
   animation: pulse 2s infinite;
+  text-align: center;
+  width: 100%;
+  display: block;
+  font-size: 18px;
+  word-break: break-word;
+  white-space: normal;
 }
 
 @keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 .trip-accepted-info p {
   margin: 0;
   font-size: 16px;
   opacity: 0.9;
+  text-align: center;
 }
 
 .close-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
   background: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 50%;

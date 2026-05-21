@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MessageSquare, Star, CreditCard, Clock, MapPin, X } from 'lucide-react'
+import { supabase } from '../lib/supabase'
+import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
 import ChatComponent from './ChatComponent'
 import RatingComponent from './RatingComponent'
 import PaymentComponent from './PaymentComponent'
@@ -11,15 +13,58 @@ interface TripAcceptedViewProps {
   onNewTrip: () => void
 }
 
-export default function TripAcceptedView({ tripId, driverName = 'Motorista', onNewTrip }: TripAcceptedViewProps) {
+export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', onNewTrip }: TripAcceptedViewProps) {
   const [activeTab, setActiveTab] = useState<'info' | 'chat' | 'rating' | 'payment'>('info')
+  const [tripDetails, setTripDetails] = useState<any>(null)
+  const [routeInfo, setRouteInfo] = useState<{ distanceKm: number; durationMin: number } | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTrip = async () => {
+      setLoading(true)
+      const { data } = await supabase
+        .from('trips')
+        .select('quoted_price, origin_lat, origin_lng, destination_lat, destination_lng, origin_address, destination_address')
+        .eq('id', tripId)
+        .single()
+      if (data) {
+        setTripDetails(data)
+        
+        // Calculate route using OSRM
+        if (data.origin_lat && data.origin_lng && data.destination_lat && data.destination_lng) {
+          try {
+            const routeData = await fetchOsrmRoute(
+              { lat: data.origin_lat, lng: data.origin_lng },
+              { lat: data.destination_lat, lng: data.destination_lng }
+            )
+            setRouteInfo({
+              distanceKm: Number((routeData.distanceMeters / 1000).toFixed(2)),
+              durationMin: Number((routeData.durationSeconds / 60).toFixed(1))
+            })
+          } catch (error) {
+            console.error('Error calculating route:', error)
+          }
+        }
+      }
+      setLoading(false)
+    }
+    fetchTrip()
+  }, [tripId])
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-AO', {
+      style: 'currency',
+      currency: 'AOA',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value)
+  }
 
   return (
     <div className="trip-accepted-view">
       <div className="trip-accepted-header">
         <div className="trip-accepted-info">
-          <h2>🚗 Motorista a caminho!</h2>
-          <p>{driverName} está a caminho para buscar você</p>
+          <p>🏍️ Motoqueiro está a caminho para buscar você</p>
         </div>
         <button className="close-btn" onClick={onNewTrip}>
           <X size={20} />
@@ -63,31 +108,47 @@ export default function TripAcceptedView({ tripId, driverName = 'Motorista', onN
       <div className="trip-content">
         {activeTab === 'info' && (
           <div className="info-content">
-            <div className="info-card">
-              <h3>📍 Informações da Viagem</h3>
-              <div className="info-item">
-                <span className="info-label">ID da Viagem:</span>
-                <span className="info-value">{tripId.substring(0, 12)}...</span>
+            {loading ? (
+              <div className="info-card">
+                <p>A carregar informações da viagem...</p>
               </div>
-              <div className="info-item">
-                <span className="info-label">Motorista:</span>
-                <span className="info-value">{driverName}</span>
+            ) : tripDetails ? (
+              <div className="info-card">
+                <h3>📍 Informações da Viagem</h3>
+                <div className="info-item">
+                  <span className="info-label">💰 Preço:</span>
+                  <span className="info-value">{tripDetails.quoted_price ? formatCurrency(tripDetails.quoted_price) : 'A calcular'}</span>
+                </div>
+                {routeInfo && (
+                  <>
+                    <div className="info-item">
+                      <span className="info-label">📏 Distância:</span>
+                      <span className="info-value">{routeInfo.distanceKm} km</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="info-label">⏱️ Tempo estimado:</span>
+                      <span className="info-value">{routeInfo.durationMin} min</span>
+                    </div>
+                  </>
+                )}
+                <div className="info-item">
+                  <span className="info-label">📍 Origem:</span>
+                  <span className="info-value">{tripDetails.origin_address ? tripDetails.origin_address.substring(0, 30) + (tripDetails.origin_address.length > 30 ? '...' : '') : 'N/A'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">🏁 Destino:</span>
+                  <span className="info-value">{tripDetails.destination_address ? tripDetails.destination_address.substring(0, 30) + (tripDetails.destination_address.length > 30 ? '...' : '') : 'N/A'}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Status:</span>
+                  <span className="info-value status-accepted">Aceito</span>
+                </div>
               </div>
-              <div className="info-item">
-                <span className="info-label">Status:</span>
-                <span className="info-value status-accepted">Aceito</span>
+            ) : (
+              <div className="info-card">
+                <p>Não foi possível carregar as informações da viagem.</p>
               </div>
-            </div>
-            
-            <div className="info-card">
-              <h3>💡 Dicas</h3>
-              <ul className="tips-list">
-                <li>Mantenha-se atento às notificações</li>
-                <li>Use o chat para comunicar com o motorista</li>
-                <li>Tenha seu documento de identificação pronto</li>
-                <li>Confirme o destino antes de iniciar</li>
-              </ul>
-            </div>
+            )}
           </div>
         )}
 

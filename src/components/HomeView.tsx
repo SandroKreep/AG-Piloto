@@ -120,7 +120,10 @@ export default function HomeView({ onGoDriver }: Props) {
   const [destinationAddress, setDestinationAddress] = useState<string | null>(() => {
     return sessionStorage.getItem('ag_destination_address') || null
   })
-  const [originCoords, setOriginCoords] = useState<Coordinates | null>(null)
+  const [originCoords, setOriginCoords] = useState<Coordinates | null>(() => {
+    const saved = sessionStorage.getItem('ag_origin_coords')
+    return saved ? JSON.parse(saved) : null
+  })
   const [route, setRoute] = useState<Array<[number, number]>>([])
   const [stats, setStats] = useState<{ distanceKm: number; durationMin: number } | null>(null)
 
@@ -144,6 +147,21 @@ export default function HomeView({ onGoDriver }: Props) {
     }
   }, [originCoords, destinationCoords])
 
+  useEffect(() => {
+    if (originCoords) sessionStorage.setItem('ag_origin_coords', JSON.stringify(originCoords))
+    else sessionStorage.removeItem('ag_origin_coords')
+  }, [originCoords])
+
+  useEffect(() => {
+    if (destinationCoords) sessionStorage.setItem('ag_destination_coords', JSON.stringify(destinationCoords))
+    else sessionStorage.removeItem('ag_destination_coords')
+  }, [destinationCoords])
+
+  useEffect(() => {
+    if (destinationAddress) sessionStorage.setItem('ag_destination_address', destinationAddress)
+    else sessionStorage.removeItem('ag_destination_address')
+  }, [destinationAddress])
+
   return (
     <div className="home">
       <header className="home__top">
@@ -156,6 +174,8 @@ export default function HomeView({ onGoDriver }: Props) {
             setDestinationCoords={setDestinationCoords}
             destinationAddress={destinationAddress}
             setDestinationAddress={setDestinationAddress}
+            originCoords={originCoords}
+            setOriginCoords={setOriginCoords}
           />
         </div>
         <button type="button" className="home__avatar" aria-label="Perfil">

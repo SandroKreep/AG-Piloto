@@ -34,10 +34,23 @@ const formatCurrency = (value: number) => {
 
 const createOriginIcon = () => {
   return L.divIcon({
-    className: 'custom-origin-icon',
-    html: '<div style="background-color: green; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: white;">A</div>',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
+    className: '',
+    html: `<div style="
+      background: #16a34a;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    ">A</div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
   });
 };
 
@@ -133,7 +146,7 @@ function MapClickHandler({
   return null;
 }
 
-function MyLocationMarker({ activeTripId, setOriginCoords }: { activeTripId: string | null; setOriginCoords: (coords: Coordinates) => void }) {
+function MyLocationMarker({ activeTripId, setOriginCoords, setGpsCoords }: { activeTripId: string | null; setOriginCoords: (coords: Coordinates) => void; setGpsCoords: (coords: Coordinates | null) => void }) {
   const [position, setPosition] = useState<L.LatLngExpression | null>(null)
   const [showLocationWarning, setShowLocationWarning] = useState(false) // New state for warning
   const map = useMap()
@@ -159,6 +172,7 @@ function MyLocationMarker({ activeTripId, setOriginCoords }: { activeTripId: str
         const newPos: L.LatLngExpression = [latitude, longitude]
         setPosition(newPos)
         setOriginCoords({ lat: latitude, lng: longitude }); // Update origin in parent
+        setGpsCoords({ lat: latitude, lng: longitude }); // Update GPS coordinates
 
         // Only center map on first GPS position
         if (!mapCentradoRef.current) {
@@ -249,6 +263,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
   const [activeTripId, setActiveTripId] = useState<string | null>(null);
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [showLocationWarning, setShowLocationWarning] = useState(false) // State for 'Destino fora da área de atuação'
+  const [gpsCoords, setGpsCoords] = useState<Coordinates | null>(null) // Track GPS coordinates
 
   const mapRef = useRef<L.Map>(null); // Add map ref
   const destinationMarkerRef = useRef<L.Marker | null>(null);
@@ -452,7 +467,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
         destinationMarkerRef.current = null;
       }
     };
-  }, [destinationCoords, destinationAddress]);
+  }, [destinationCoords, destinationAddress, mapRef.current]);
 
   // Effect to manage route layer imperatively
   useEffect(() => {
@@ -543,7 +558,14 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
               <Popup>Destino: {activeTrip.destination_address}</Popup>
             </Marker>
           )}
-          <MyLocationMarker activeTripId={activeTripId} setOriginCoords={setOriginCoords} />
+          {originCoords && gpsCoords && 
+           (Math.abs(originCoords.lat - gpsCoords.lat) > 0.0001 || 
+            Math.abs(originCoords.lng - gpsCoords.lng) > 0.0001) && (
+            <Marker position={[originCoords.lat, originCoords.lng]} icon={createOriginIcon()}>
+              <Popup>Origem escolhida</Popup>
+            </Marker>
+          )}
+          <MyLocationMarker activeTripId={activeTripId} setOriginCoords={setOriginCoords} setGpsCoords={setGpsCoords} />
           {activeTrip && activeTrip.status === 'accepted' && activeTripId && (
             <DriverTracking driverId={activeTrip.driver_id || null} tripId={activeTripId} />
           )}
