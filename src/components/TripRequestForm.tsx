@@ -139,6 +139,7 @@ export default function TripRequestForm({
   setDestinationAddress,
   originCoords,
   setOriginCoords,
+  onReset,
 }: {
   destinationCoords: Coordinates | null
   setDestinationCoords: (coords: Coordinates | null) => void
@@ -146,6 +147,7 @@ export default function TripRequestForm({
   setDestinationAddress: (address: string | null) => void
   originCoords: Coordinates | null
   setOriginCoords: (coords: Coordinates | null) => void
+  onReset?: () => void
 }) {
   const [originAddress, setOriginAddress] = useState(() => {
     return sessionStorage.getItem('ag_origin_address') || ''
@@ -862,6 +864,40 @@ export default function TripRequestForm({
         disabled={loading || !destinationCoords || routeLoading}
       >
         {routeLoading ? 'Calculando rota...' : loading ? 'Solicitando...' : 'Próximo'}
+      </button>
+      
+      <button 
+        type="button"
+        onClick={() => {
+          sessionStorage.removeItem('ag_origin_coords')
+          sessionStorage.removeItem('ag_destination_coords')
+          sessionStorage.removeItem('ag_destination_address')
+          sessionStorage.removeItem('ag_origin_address')
+          setOriginCoords(null)
+          setDestinationCoords(null)
+          setDestinationAddress(null)
+          setOriginAddress('')
+          setDestinoTexto('')
+          setRouteData(null)
+          geocodingDone.current = false
+          originFixed.current = false
+          destinoFixo.current = false
+          originCoordsRef.current = null
+          onReset?.()
+        }}
+        style={{
+          background: 'transparent',
+          color: '#6b7280',
+          border: '1px solid #d1d5db',
+          borderRadius: '4px',
+          padding: '10px 20px',
+          fontSize: '14px',
+          cursor: 'pointer',
+          width: '100%',
+          marginTop: '-8px'
+        }}
+      >
+        🔄 Nova Viagem
       </button>
     </form>
   )

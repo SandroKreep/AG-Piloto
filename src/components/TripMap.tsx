@@ -231,6 +231,7 @@ type Props = {
   route: Array<[number, number]>
   stats: { distanceKm: number; durationMin: number } | null
   resetMap?: boolean
+  onReset?: () => void
 }
 
 type Trip = {
