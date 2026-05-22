@@ -230,6 +230,7 @@ type Props = {
   setOriginCoords: (coords: Coordinates | null) => void
   route: Array<[number, number]>
   stats: { distanceKm: number; durationMin: number } | null
+  resetMap?: boolean
 }
 
 type Trip = {
@@ -254,7 +255,7 @@ type Trip = {
   driver_lng?: number
 }
 
-export default function TripMap({ destinationCoords, setDestinationCoords, destinationAddress, setDestinationAddress, originCoords, setOriginCoords }: Props) {
+export default function TripMap({ destinationCoords, setDestinationCoords, destinationAddress, setDestinationAddress, originCoords, setOriginCoords, resetMap }: Props) {
 
   const [route, setRoute] = useState<Array<[number, number]>>([])
   const [stats, setStats] = useState<{ distanceKm: number; durationMin: number } | null>(null)
@@ -337,7 +338,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
 
   // Effect to show route from originCoords and destinationCoords (before trip is submitted)
   useEffect(() => {
-    if (!activeTrip && originCoords && destinationCoords) {
+    if (originCoords && destinationCoords && !activeTripId) {
       let isActive = true
       setIsLoading(true)
 
@@ -376,7 +377,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
         isActive = false
       }
     }
-  }, [originCoords, destinationCoords, activeTrip])
+  }, [originCoords, destinationCoords, activeTripId])
 
   // Custom AntPath component for react-leaflet
   useEffect(() => {
@@ -496,6 +497,42 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
       }
     };
   }, [route]);
+
+  // Effect to remove markers and route when both coords are null
+  useEffect(() => {
+    if (!originCoords && !destinationCoords) {
+      // Remove marker de destino se existir
+      if (destinationMarkerRef.current) {
+        destinationMarkerRef.current.remove()
+        destinationMarkerRef.current = null
+      }
+      // Remover rota se existir
+      if (routeLayerRef.current) {
+        routeLayerRef.current.remove()
+        routeLayerRef.current = null
+      }
+    }
+  }, [originCoords, destinationCoords])
+
+  // Effect to reset map when resetMap prop is true
+  useEffect(() => {
+    if (resetMap) {
+      setActiveTripId(null)
+      setActiveTrip(null)
+      setRoute([])
+      setStats(null)
+      setError(null)
+      localStorage.removeItem('activeTripId')
+      if (destinationMarkerRef.current) {
+        destinationMarkerRef.current.remove()
+        destinationMarkerRef.current = null
+      }
+      if (routeLayerRef.current) {
+        routeLayerRef.current.remove()
+        routeLayerRef.current = null
+      }
+    }
+  }, [resetMap])
 
   return (
     <section className="trip-map" aria-label="Mapa de rota com Leaflet">

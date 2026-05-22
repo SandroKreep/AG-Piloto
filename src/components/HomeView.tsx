@@ -126,6 +126,7 @@ export default function HomeView({ onGoDriver }: Props) {
   })
   const [route, setRoute] = useState<Array<[number, number]>>([])
   const [stats, setStats] = useState<{ distanceKm: number; durationMin: number } | null>(null)
+  const [resetMap, setResetMap] = useState(false)
 
   useEffect(() => {
     if (originCoords && destinationCoords) {
@@ -176,6 +177,10 @@ export default function HomeView({ onGoDriver }: Props) {
             setDestinationAddress={setDestinationAddress}
             originCoords={originCoords}
             setOriginCoords={setOriginCoords}
+            onReset={() => {
+              setResetMap(true)
+              setTimeout(() => setResetMap(false), 100)
+            }}
           />
         </div>
         <button type="button" className="home__avatar" aria-label="Perfil">
@@ -204,6 +209,7 @@ export default function HomeView({ onGoDriver }: Props) {
           setOriginCoords={setOriginCoords}
           route={route}
           stats={stats}
+          resetMap={resetMap}
         />
       </section>
 
