@@ -8,7 +8,7 @@ import { Howl } from 'howler'
 import { MapPin, Bike, Car, Truck } from 'lucide-react'
 import { isValidLuandaCoordinate, formatCurrency } from '../lib/geoUtils'
 import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
-import DriverApplications from './DriverApplications'
+import FretesTab from './FretesTab'
 import { iconeUsuario, iconeDestino } from '../lib/mapIcons'
 
 // Helper function to format currency
@@ -158,8 +158,9 @@ function ControlTower({ vehicles }: Props) {
   const [route, setRoute] = useState<Array<[number, number]>>([])
   const [routeLoading, setRouteLoading] = useState<boolean>(false)
   const [isLoadingTrips, setIsLoadingTrips] = useState<boolean>(true) // New loading state for trips
-  const [activeTab, setActiveTab] = useState<'trips' | 'applications'>('trips') // New state for tabs
+  const [activeTab, setActiveTab] = useState<'trips' | 'fretes'>('trips')
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'accepted' | 'completed' | 'cancelled'>('all')
+  const [fretes, setFretes] = useState<any[]>([])
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -338,6 +339,22 @@ function ControlTower({ vehicles }: Props) {
 
     fetchActiveTrips()
 
+    // Fetch fretes data
+    const fetchFretes = async () => {
+      const { data, error } = await supabase
+        .from('fretes')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error fetching fretes:', error)
+      } else if (data) {
+        setFretes(data)
+      }
+    }
+
+    fetchFretes()
+
     const channel = supabase
       .channel('control-tower-trips')
       .on(
@@ -393,6 +410,28 @@ function ControlTower({ vehicles }: Props) {
           if (selectedTrip?.id === updatedTrip.id && (updatedTrip.status === 'completed' || updatedTrip.status === 'cancelled')) {
             setSelectedTrip(null) // Clear selected trip if it was completed/cancelled
           }
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'fretes' },
+        async (payload) => {
+          setFretes((prevFretes) => [payload.new, ...prevFretes])
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'fretes' },
+        (payload) => {
+          setFretes((prevFretes) => {
+            const index = prevFretes.findIndex((f) => f.id === payload.new.id)
+            if (index > -1) {
+              const newFretes = [...prevFretes]
+              newFretes[index] = payload.new
+              return newFretes
+            }
+            return prevFretes
+          })
         },
       )
       .subscribe()
@@ -488,10 +527,10 @@ function ControlTower({ vehicles }: Props) {
             🚗 Pedidos
           </button>
           <button
-            className={`tab-button ${activeTab === 'applications' ? 'active' : ''}`}
-            onClick={() => setActiveTab('applications')}
+            className={`tab-button ${activeTab === 'fretes' ? 'active' : ''}`}
+            onClick={() => setActiveTab('fretes')}
           >
-            📋 Candidaturas
+            🚚 Fretes
           </button>
         </div>
         
@@ -574,7 +613,7 @@ function ControlTower({ vehicles }: Props) {
             </div>
           </>
         ) : (
-          <DriverApplications />
+          <FretesTab fretes={fretes} />
         )}
       </div>
       <div className="control-tower__main-content">

@@ -4,6 +4,7 @@ import ControlTower, { type VehicleLive } from './ControlTower'
 import FinancialSummary from './FinancialSummary'
 import type { SchoolScheduleRow } from './SchoolSchedulesTab'
 import type { TripRow } from './TripTable'
+import FretesTab from './FretesTab'
 import { useAuthSession } from '../hooks/useAuthSession'
 import { supabase } from '../lib/supabase'
 import './MapDashboard.css'
@@ -17,7 +18,8 @@ export default function MapDashboard() {
   const [vehicles, setVehicles] = useState<VehicleLive[]>([])
   const [trips, setTrips] = useState<TripRow[]>([])
   const [schedules, setSchedules] = useState<SchoolScheduleRow[]>([])
-  const [activeTab, setActiveTab] = useState<'operacoes' | 'escolar'>('operacoes')
+  const [fretes, setFretes] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState<'operacoes' | 'fretes'>('operacoes')
   const [message, setMessage] = useState<string | null>(null)
   const { token, loading } = useAuthSession()
   const fallbackAdminId = useMemo(() => localStorage.getItem('ag_admin_id') ?? 'admin-demo-id', [])
@@ -79,6 +81,19 @@ export default function MapDashboard() {
   }, [fallbackAdminId])
 
   useEffect(() => {
+    const channel = supabase
+      .channel('fretes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fretes' }, (payload) => {
+        setFretes((prev) => [payload.new as any, ...prev])
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [])
+
+  useEffect(() => {
     async function loadInitial() {
       const { data: tripRows } = await supabase
         .from('trips')
@@ -115,6 +130,13 @@ export default function MapDashboard() {
           lastProgressAt: row.created_at ? String(row.created_at) : null,
         })),
       )
+
+      const { data: fretesRows } = await supabase
+        .from('fretes')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      setFretes(fretesRows ?? [])
     }
 
     void loadInitial()
@@ -161,7 +183,7 @@ export default function MapDashboard() {
       <header className="map-dashboard__header">
         <h2 className="map-dashboard__title">Base de Controle Central</h2>
         <p className="map-dashboard__subtitle">
-          Torre de operações AG-PILOTO com monitoramento ao vivo, intervenção e gestão financeira.
+          Torre de operações AG-PILOTO com monitoramento ao vivo e intervenção.
         </p>
       </header>
 
@@ -170,10 +192,10 @@ export default function MapDashboard() {
           <ControlTower vehicles={vehicles} />
           <div className="map-dashboard__tabs">
             <button type="button" className={activeTab === 'operacoes' ? 'is-active' : ''} onClick={() => setActiveTab('operacoes')}>
-              Operações
+              Pedidos
             </button>
-            <button type="button" className={activeTab === 'escolar' ? 'is-active' : ''} onClick={() => setActiveTab('escolar')}>
-              Agendamentos Escolares
+            <button type="button" className={activeTab === 'fretes' ? 'is-active' : ''} onClick={() => setActiveTab('fretes')}>
+              Fretes
             </button>
           </div>
           <Suspense fallback={<p className="map-dashboard__message">A carregar módulo da aba...</p>}>
@@ -184,15 +206,10 @@ export default function MapDashboard() {
                 onReassign={async (tripId) => runAction(tripId, 'reassign')}
               />
             ) : (
-              <SchoolSchedulesTab rows={schedules} />
+              <FretesTab fretes={fretes} />
             )}
           </Suspense>
         </div>
-        <FinancialSummary
-          completedToday={financial.completedToday}
-          totalCommissionCents={financial.totalCommissionCents}
-          payoutAvailableCents={financial.payoutAvailableCents}
-        />
       </div>
 
       {loading ? <p className="map-dashboard__message">Validando sessão...</p> : null}

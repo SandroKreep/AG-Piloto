@@ -35,20 +35,27 @@
 
 .map-dashboard__main {
   min-width: 0;
+  min-width: 400px;
 }
 
 .map-dashboard__tabs {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin: 12px 0;
+  overflow: visible;
+  flex-wrap: wrap;
+  width: 100%;
+  min-width: fit-content;
 }
 
 .map-dashboard__tabs button {
   border: 1px solid #d1d5db;
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   background: #fff;
   font-weight: 600;
+  flex-shrink: 0;
+  font-size: 0.85rem;
 }
 
 .map-dashboard__tabs button.is-active {

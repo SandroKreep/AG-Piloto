@@ -1,0 +1,223 @@
+.frete-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+.frete-page__header {
+  background: #F97316;
+  color: white;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.frete-page__badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.frete-page__title {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.frete-page__subtitle {
+  font-size: 16px;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.frete-page__message {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.frete-page__message--success {
+  background: #10b981;
+  color: white;
+}
+
+.frete-page__message--error {
+  background: #ef4444;
+  color: white;
+}
+
+.frete-page__form {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.frete-page__form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.frete-page__form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+.frete-page__input,
+.frete-page__textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.frete-page__input:focus,
+.frete-page__textarea:focus {
+  border-color: #F97316;
+}
+
+.frete-page__textarea {
+  resize: vertical;
+}
+
+.frete-page__file-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.frete-page__file-input:hover {
+  border-color: #F97316;
+}
+
+.frete-page__image-preview {
+  max-width: 100%;
+  max-height: 200px;
+  margin-top: 12px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.frete-page__suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.frete-page__suggestion {
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+}
+
+.frete-page__suggestion:hover {
+  background: #f9fafb;
+}
+
+.frete-page__suggestion:last-child {
+  border-bottom: none;
+}
+
+.frete-page__price-card {
+  background: #10b981;
+  color: white;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.frete-page__price-label {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.frete-page__price-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.frete-page__price-details {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.frete-page__submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #F97316;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.frete-page__submit-btn:hover {
+  background: #ea580c;
+}
+
+.frete-page__submit-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.frete-page__map-container {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+}
+
+.frete-page__map {
+  height: 300px;
+}
+
+@media (min-width: 768px) {
+  .frete-page__map {
+    height: 400px;
+  }
+}
+
+.frete-page__route-info {
+  background: #fff7ed;
+  border: 1px solid #F97316;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+}

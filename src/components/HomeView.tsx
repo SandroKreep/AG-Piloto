@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './HomeView.css'
 import TripMap from './TripMap'
 import TripRequestForm from './TripRequestForm'
@@ -8,8 +9,8 @@ import { fetchOsrmRoute } from '../services/osrm'
 type ServiceItem = {
   title: string
   desc: string
-  tone: 'peach' | 'mint' | 'yellow' | 'pink' | 'blue' | 'purple'
-  icon: 'moto' | 'box' | 'cup' | 'cross' | 'bag' | 'doc'
+  tone: 'peach' | 'mint' | 'yellow' | 'pink' | 'blue' | 'purple' | 'orange'
+  icon: 'moto' | 'box' | 'cup' | 'cross' | 'bag' | 'doc' | 'truck'
 }
 
 const mainServices: ServiceItem[] = [
@@ -20,7 +21,7 @@ const mainServices: ServiceItem[] = [
 const moreServices: ServiceItem[] = [
   { title: 'Comida', desc: 'Restaurantes e comida para levar', tone: 'yellow', icon: 'cup' },
   { title: 'Farmácia', desc: 'Medicamentos urgentes 24 horas por dia', tone: 'pink', icon: 'cross' },
-  { title: 'Mercado', desc: 'Compras de mercado para casa', tone: 'blue', icon: 'bag' },
+  { title: 'Frete', desc: 'Transporte de materiais com Kupapata', tone: 'orange', icon: 'truck' },
   { title: 'Documentos', desc: 'Levantar e entregar com segurança', tone: 'purple', icon: 'doc' },
 ]
 
@@ -86,6 +87,17 @@ function ServiceIcon({ item }: { item: ServiceItem }) {
             fill="none"
           />
         )
+      case 'truck':
+        return (
+          <path
+            d="M4 16h2l1-5h9l1 5h2M5 16v2h14v-2M7 11l1-5h8l1 5"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        )
     }
   })()
 
@@ -98,9 +110,9 @@ function ServiceIcon({ item }: { item: ServiceItem }) {
   )
 }
 
-function ServiceCard({ item }: { item: ServiceItem }) {
+function ServiceCard({ item, onClick }: { item: ServiceItem; onClick?: () => void }) {
   return (
-    <article className="svc-card">
+    <article className="svc-card" onClick={onClick} style={onClick ? { cursor: 'pointer' } : undefined}>
       <ServiceIcon item={item} />
       <h3 className="svc-card__title">{item.title}</h3>
       <p className="svc-card__desc">{item.desc}</p>
@@ -113,6 +125,7 @@ type Props = {
 }
 
 export default function HomeView({ onGoDriver }: Props) {
+  const navigate = useNavigate()
   const [destinationCoords, setDestinationCoords] = useState<Coordinates | null>(() => {
     const saved = sessionStorage.getItem('ag_destination_coords')
     return saved ? JSON.parse(saved) : null
@@ -230,7 +243,11 @@ export default function HomeView({ onGoDriver }: Props) {
         </h2>
         <div className="home__grid home__grid--2 home__grid--more">
           {moreServices.map((item) => (
-            <ServiceCard key={item.title} item={item} />
+            <ServiceCard
+              key={item.title}
+              item={item}
+              onClick={item.title === 'Farmácia' ? () => navigate('/farmacia') : item.title === 'Frete' ? () => navigate('/frete') : undefined}
+            />
           ))}
         </div>
       </section>

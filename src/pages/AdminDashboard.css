@@ -32,6 +32,98 @@
   color: var(--text-muted);
 }
 
+.admin-page__tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
+}
+
+.admin-page__tab {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.admin-page__tab:hover {
+  background: #f3f4f6;
+}
+
+.admin-page__tab--active {
+  background: #F97316;
+  color: white;
+}
+
+.admin-page__fretes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-page__empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 32px;
+}
+
+.admin-page__frete-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.admin-page__frete-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.admin-page__frete-date {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.admin-page__frete-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-page__frete-body p {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.admin-page__accept-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-page__accept-btn:hover {
+  background: #15803d;
+}
+
 @media (min-width: 768px) {
   .admin-page {
     padding: 28px 28px 56px;

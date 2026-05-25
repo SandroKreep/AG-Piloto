@@ -12,6 +12,10 @@ import CandidaturaPage from './pages/motoqueiro/candidatura/page'
 import AuthModal from './components/AuthModal'
 import Profile from './components/Profile'
 import AdminDashboard from './pages/AdminDashboard'
+import AdminFarmacia from './pages/AdminFarmacia'
+import Farmacia from './pages/Farmacia'
+import Frete from './pages/Frete'
+import ProtectedRoute from './components/ProtectedRoute'
 import { useAuthStore } from './store/authStore'
 
 const MotoqueiroView = lazy(() => import('./components/MotoqueiroView'))
@@ -54,6 +58,18 @@ export default function App() {
       <Route
         path="/admin"
         element={<AdminDashboard />}
+      />
+      <Route
+        path="/admin/farmacia"
+        element={<AdminFarmacia />}
+      />
+      <Route
+        path="/farmacia"
+        element={<Farmacia />}
+      />
+      <Route
+        path="/frete"
+        element={<Frete />}
       />
       <Route
         path="/trips/:tripId"

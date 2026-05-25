@@ -13,16 +13,29 @@ export function isValidLuandaCoordinate(latitude: number, longitude: number): bo
 }
 
 export async function reverseGeocodeCoordinates(lat: number, lng: number): Promise<string> {
-  try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&accept-language=pt`,
-      { headers: { 'User-Agent': 'AG-PILOTO/1.0' } }
-    );
-    const data = await response.json();
-    const nome = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-    return nome;
-  } catch (error) {
-    console.error('Error reverse geocoding coordinates:', error);
-    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-  }
+  const tryReverseGeocode = async (): Promise<string | null> => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18&accept-language=pt`,
+        { headers: { 'User-Agent': 'AG-PILOTO/1.0' } }
+      );
+      const data = await response.json();
+      return data.display_name || null;
+    } catch (error) {
+      console.error('Error reverse geocoding coordinates:', error);
+      return null;
+    }
+  };
+
+  // Try first attempt
+  let result = await tryReverseGeocode();
+  if (result) return result;
+
+  // Retry after 1 second
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  result = await tryReverseGeocode();
+  if (result) return result;
+
+  // Fallback after 2 failures
+  return 'Localização obtida';
 }

@@ -206,14 +206,13 @@ export default function TripRequestForm({
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto + ' Luanda Angola')}&format=json&limit=10&countrycodes=ao&accept-language=pt&addressdetails=1`,
-          { headers: { 'User-Agent': 'AG-PILOTO/1.0' } }
+          `/api/geocode?q=${encodeURIComponent(texto + ' Luanda Angola')}`
         )
         const data = await res.json()
         setSugestoes(data)
         setMostrarSugestoes(true)
       } catch (err) {
-        console.error('Erro autocomplete:', err)
+        console.error('Erro autocomplete destino:', err)
       }
     }, 800)
   }
@@ -249,8 +248,7 @@ export default function TripRequestForm({
     originDebounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(texto)}&format=json&addressdetails=1&limit=5&countrycodes=ao`,
-          { headers: { 'User-Agent': 'ag-piloto-app/1.0' } }
+          `/api/geocode?q=${encodeURIComponent(texto + ' Luanda Angola')}`
         )
         const data = await res.json()
         setOriginSuggestions(data)

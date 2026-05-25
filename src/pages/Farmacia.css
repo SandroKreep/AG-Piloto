@@ -1,0 +1,484 @@
+.farmacia {
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.farmacia__header {
+  background: #1a5c38;
+  color: white;
+  padding: 1.5rem 1rem;
+}
+
+.farmacia__header-content {
+  max-width: 1200px;
+  margin: 0 auto 1rem;
+}
+
+.farmacia__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.farmacia__logo h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.farmacia__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.farmacia__search {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.farmacia__search-input {
+  width: 100%;
+  padding: 0.875rem 3rem 0.875rem 1rem;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.farmacia__search-input:focus {
+  outline: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.farmacia__search-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.25rem;
+}
+
+.farmacia__banner {
+  background: #e8f5e9;
+  color: #1a5c38;
+  text-align: center;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.farmacia__filters {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.farmacia__filters::-webkit-scrollbar {
+  display: none;
+}
+
+.farmacia__filter {
+  padding: 0.625rem 1.25rem;
+  border-radius: 25px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #666;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.farmacia__filter:hover {
+  border-color: #1a5c38;
+  color: #1a5c38;
+}
+
+.farmacia__filter--active {
+  background: #1a5c38;
+  color: white;
+  border-color: #1a5c38;
+}
+
+.farmacia__loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.farmacia__empty {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.farmacia__grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.farmacia__card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.farmacia__card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: scale(1.02);
+}
+
+.farmacia__card-image {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.farmacia__card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.farmacia__card-image-placeholder {
+  font-size: 3rem;
+  color: #ddd;
+}
+
+.farmacia__card-category {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #1a5c38;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.farmacia__card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem 0;
+}
+
+.farmacia__card-desc {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.farmacia__card-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a5c38;
+  margin-bottom: 0.75rem;
+}
+
+.farmacia__card-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #1a5c38;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.farmacia__card-btn:hover {
+  background: #145a2e;
+}
+
+.farmacia__card-unavailable {
+  display: block;
+  text-align: center;
+  padding: 0.75rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.farmacia__footer {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-size: 0.875rem;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+}
+
+.farmacia__modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.farmacia__modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.farmacia__modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  background: #1a5c38;
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.farmacia__modal-header h2 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.farmacia__modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.farmacia__modal-body {
+  padding: 1.5rem;
+}
+
+.farmacia__modal-section {
+  margin-bottom: 1.5rem;
+}
+
+.farmacia__modal-section label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.farmacia__quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.farmacia__quantity-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.farmacia__quantity-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #1a5c38;
+}
+
+.farmacia__quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.farmacia__quantity-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  min-width: 2rem;
+  text-align: center;
+}
+
+.farmacia__modal-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.farmacia__modal-input:focus {
+  outline: none;
+  border-color: #1a5c38;
+  box-shadow: 0 0 0 3px rgba(26, 92, 56, 0.1);
+}
+
+.farmacia__suggestions {
+  margin-top: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.farmacia__suggestion {
+  padding: 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.farmacia__suggestion:hover {
+  background: #f9fafb;
+}
+
+.farmacia__suggestion:last-child {
+  border-bottom: none;
+}
+
+.farmacia__modal-summary {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.farmacia__summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.farmacia__summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.farmacia__summary-row--total {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1a1a1a;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 0.5rem;
+}
+
+.farmacia__modal-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.farmacia__modal-btn {
+  flex: 1;
+  padding: 0.875rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.farmacia__modal-btn--cancel {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.farmacia__modal-btn--cancel:hover {
+  background: #d1d5db;
+}
+
+.farmacia__modal-btn--confirm {
+  background: #1a5c38;
+  color: white;
+}
+
+.farmacia__modal-btn--confirm:hover:not(:disabled) {
+  background: #145a2e;
+}
+
+.farmacia__modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .farmacia__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .farmacia__header {
+    padding: 1rem;
+  }
+
+  .farmacia__logo {
+    font-size: 1.25rem;
+  }
+
+  .farmacia__logo h1 {
+    font-size: 1.25rem;
+  }
+
+  .farmacia__modal {
+    max-height: 95vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .farmacia__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .farmacia__filters {
+    padding: 1rem;
+  }
+}
