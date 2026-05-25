@@ -246,7 +246,7 @@ export default function HomeView({ onGoDriver }: Props) {
             <ServiceCard
               key={item.title}
               item={item}
-              onClick={item.title === 'Farmácia' ? () => navigate('/farmacia') : item.title === 'Frete' ? () => navigate('/frete') : undefined}
+              onClick={item.title === 'Farmácia' ? () => navigate('/farmacia') : item.title === 'Frete' ? () => navigate('/frete') : item.title === 'Documentos' ? () => navigate('/documentos') : undefined}
             />
           ))}
         </div>

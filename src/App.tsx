@@ -15,6 +15,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminFarmacia from './pages/AdminFarmacia'
 import Farmacia from './pages/Farmacia'
 import Frete from './pages/Frete'
+import Documentos from './pages/Documentos'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuthStore } from './store/authStore'
 
@@ -70,6 +71,10 @@ export default function App() {
       <Route
         path="/frete"
         element={<Frete />}
+      />
+      <Route
+        path="/documentos"
+        element={<Documentos />}
       />
       <Route
         path="/trips/:tripId"

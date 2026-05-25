@@ -97,7 +97,7 @@ export default function MapDashboard() {
     async function loadInitial() {
       const { data: tripRows } = await supabase
         .from('trips')
-        .select('id,status,quoted_price,final_price,service_id,driver_id,passenger_id,requested_at')
+        .select('id,status,quoted_price,final_price,service_id,driver_id,passenger_id,requested_at,metadata')
         .order('requested_at', { ascending: false })
         .limit(80)
 
@@ -105,14 +105,20 @@ export default function MapDashboard() {
       const serviceMap = new Map((services ?? []).map((item) => [item.id as string, item.code as TripRow['serviceType']]))
 
       setTrips(
-        (tripRows ?? []).map((row) => ({
-          id: String(row.id),
-          status: String(row.status ?? 'REQUESTED').toUpperCase(),
-          serviceType: serviceMap.get(String(row.service_id)) ?? 'taxi',
-          driverName: row.driver_id ? `Driver ${String(row.driver_id).slice(0, 6)}` : 'Aguardando',
-          customerName: row.passenger_id ? `Cliente ${String(row.passenger_id).slice(0, 6)}` : 'Cliente',
-          valueCents: Math.round(Number(row.final_price ?? row.quoted_price ?? 0) * 100),
-        })),
+        (tripRows ?? []).map((row) => {
+          // Check if service_type is in metadata (for farmacia, documentos, etc.)
+          const serviceTypeFromMetadata = (row.metadata as any)?.service_type as string
+          const serviceType = (serviceTypeFromMetadata as TripRow['serviceType']) || (serviceMap.get(String(row.service_id)) ?? 'taxi')
+
+          return {
+            id: String(row.id),
+            status: String(row.status ?? 'REQUESTED').toUpperCase(),
+            serviceType: serviceType as TripRow['serviceType'],
+            driverName: row.driver_id ? `Driver ${String(row.driver_id).slice(0, 6)}` : 'Aguardando',
+            customerName: row.passenger_id ? `Cliente ${String(row.passenger_id).slice(0, 6)}` : 'Cliente',
+            valueCents: Math.round(Number(row.final_price ?? row.quoted_price ?? 0) * 100),
+          }
+        }),
       )
 
       const { data: schedulesRows } = await supabase

@@ -3,7 +3,7 @@ import { memo, useMemo, useState } from 'react'
 export type TripRow = {
   id: string
   status: string
-  serviceType: 'taxi' | 'familiar' | 'frete'
+  serviceType: 'taxi' | 'familiar' | 'frete' | 'farmacia' | 'documentos'
   driverName: string
   customerName: string
   valueCents: number
@@ -16,6 +16,23 @@ type Props = {
 }
 
 const PAGE_SIZE = 8
+
+function getServiceIcon(serviceType: TripRow['serviceType']): string {
+  switch (serviceType) {
+    case 'taxi':
+      return '🏍️'
+    case 'familiar':
+      return '👨‍👩‍👧‍👦'
+    case 'frete':
+      return '🚚'
+    case 'farmacia':
+      return '💊'
+    case 'documentos':
+      return '📄'
+    default:
+      return '📦'
+  }
+}
 
 function TripTable({ trips, onForceCancel, onReassign }: Props) {
   const [statusFilter, setStatusFilter] = useState<'all' | string>('all')
@@ -53,6 +70,8 @@ function TripTable({ trips, onForceCancel, onReassign }: Props) {
             <option value="taxi">Táxi</option>
             <option value="familiar">Familiar</option>
             <option value="frete">Frete</option>
+            <option value="farmacia">Farmácia</option>
+            <option value="documentos">Documentos</option>
           </select>
         </div>
       </div>
@@ -75,7 +94,7 @@ function TripTable({ trips, onForceCancel, onReassign }: Props) {
               <tr key={trip.id}>
                 <td>{trip.id.slice(0, 8)}</td>
                 <td>{trip.status}</td>
-                <td>{trip.serviceType}</td>
+                <td>{getServiceIcon(trip.serviceType)} {trip.serviceType}</td>
                 <td>{trip.driverName}</td>
                 <td>{trip.customerName}</td>
                 <td>{(trip.valueCents / 100).toLocaleString('pt-AO')} Kz</td>
