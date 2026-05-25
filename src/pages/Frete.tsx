@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { MapContainer, Marker, TileLayer, ZoomControl, Polyline } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -26,6 +27,7 @@ type Suggestion = {
 }
 
 export default function Frete() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState<FormData>({
     descricao: '',
     origemAddress: '',
@@ -322,6 +324,23 @@ export default function Frete() {
 
   return (
     <div className="frete-page">
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: '#6b7280',
+          fontSize: '14px',
+          padding: '12px 16px',
+          fontWeight: '500'
+        }}
+      >
+        ← Voltar
+      </button>
       <header className="frete-page__header">
         <span className="frete-page__badge">AG-PILOTO</span>
         <h1 className="frete-page__title">🛺 Frete Kupapata</h1>

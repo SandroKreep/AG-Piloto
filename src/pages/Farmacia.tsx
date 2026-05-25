@@ -163,6 +163,23 @@ export default function Farmacia() {
 
   return (
     <div className="farmacia">
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: '#6b7280',
+          fontSize: '14px',
+          padding: '12px 16px',
+          fontWeight: '500'
+        }}
+      >
+        ← Voltar
+      </button>
       <header className="farmacia__header">
         <div className="farmacia__header-content">
           <div className="farmacia__logo">
