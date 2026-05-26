@@ -140,6 +140,7 @@ export default function TripRequestForm({
   originCoords,
   setOriginCoords,
   onReset,
+  onOriginManuallyChosen,
 }: {
   destinationCoords: Coordinates | null
   setDestinationCoords: (coords: Coordinates | null) => void
@@ -148,6 +149,7 @@ export default function TripRequestForm({
   originCoords: Coordinates | null
   setOriginCoords: (coords: Coordinates | null) => void
   onReset?: () => void
+  onOriginManuallyChosen?: () => void
 }) {
   const [originAddress, setOriginAddress] = useState(() => {
     return sessionStorage.getItem('ag_origin_address') || ''
@@ -290,6 +292,9 @@ export default function TripRequestForm({
     
     // Recalcula a rota directamente com as coordenadas escolhidas
     calcularRota({ lat, lng }, destinationCoords || undefined)
+    
+    // Notifica que o utilizador escolheu a origem manualmente
+    onOriginManuallyChosen?.()
   }
 
   useEffect(() => {

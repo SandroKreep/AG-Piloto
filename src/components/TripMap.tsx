@@ -146,7 +146,7 @@ function MapClickHandler({
   return null;
 }
 
-function MyLocationMarker({ activeTripId, setOriginCoords, setGpsCoords }: { activeTripId: string | null; setOriginCoords: (coords: Coordinates) => void; setGpsCoords: (coords: Coordinates | null) => void }) {
+function MyLocationMarker({ activeTripId, setGpsCoords, onGpsCoordsChange }: { activeTripId: string | null; setGpsCoords: (coords: Coordinates | null) => void; onGpsCoordsChange?: (coords: Coordinates) => void }) {
   const [position, setPosition] = useState<L.LatLngExpression | null>(null)
   const [showLocationWarning, setShowLocationWarning] = useState(false) // New state for warning
   const map = useMap()
@@ -171,7 +171,7 @@ function MyLocationMarker({ activeTripId, setOriginCoords, setGpsCoords }: { act
 
         const newPos: L.LatLngExpression = [latitude, longitude]
         setPosition(newPos)
-        setOriginCoords({ lat: latitude, lng: longitude }); // Update origin in parent
+        onGpsCoordsChange?.({ lat: latitude, lng: longitude }); // Notify parent of GPS coordinates
         setGpsCoords({ lat: latitude, lng: longitude }); // Update GPS coordinates
 
         // Only center map on first GPS position
@@ -201,7 +201,7 @@ function MyLocationMarker({ activeTripId, setOriginCoords, setGpsCoords }: { act
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-  }, [map, activeTripId, setOriginCoords])
+  }, [map, activeTripId, onGpsCoordsChange])
 
   return (
     <>
@@ -232,6 +232,8 @@ type Props = {
   stats: { distanceKm: number; durationMin: number } | null
   resetMap?: boolean
   onReset?: () => void
+  userChoseOrigin?: boolean
+  onGpsCoordsChange?: (coords: Coordinates) => void
 }
 
 type Trip = {
@@ -256,7 +258,7 @@ type Trip = {
   driver_lng?: number
 }
 
-export default function TripMap({ destinationCoords, setDestinationCoords, destinationAddress, setDestinationAddress, originCoords, setOriginCoords, resetMap }: Props) {
+export default function TripMap({ destinationCoords, setDestinationCoords, destinationAddress, setDestinationAddress, originCoords, setOriginCoords, resetMap, userChoseOrigin, onGpsCoordsChange }: Props) {
 
   const [route, setRoute] = useState<Array<[number, number]>>([])
   const [stats, setStats] = useState<{ distanceKm: number; durationMin: number } | null>(null)
@@ -451,8 +453,8 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
       originMarkerRef.current = null;
     }
 
-    // Add new marker if origin exists
-    if (originCoords) {
+    // Add new marker if origin exists and user chose it manually
+    if (originCoords && userChoseOrigin) {
       const marker = L.marker([originCoords.lat, originCoords.lng], {
         icon: createOriginIcon()
       }).addTo(mapRef.current);
@@ -468,7 +470,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
         originMarkerRef.current = null;
       }
     };
-  }, [originCoords, mapRef.current]);
+  }, [originCoords, userChoseOrigin, mapRef.current]);
 
   // Effect to manage destination marker imperatively
   useEffect(() => {
@@ -635,7 +637,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
               <Popup>Destino: {activeTrip.destination_address}</Popup>
             </Marker>
           )}
-          <MyLocationMarker activeTripId={activeTripId} setOriginCoords={setOriginCoords} setGpsCoords={setGpsCoords} />
+          <MyLocationMarker activeTripId={activeTripId} setGpsCoords={setGpsCoords} onGpsCoordsChange={onGpsCoordsChange} />
           {activeTrip && activeTrip.status === 'accepted' && activeTripId && (
             <DriverTracking driverId={activeTrip.driver_id || null} tripId={activeTripId} />
           )}

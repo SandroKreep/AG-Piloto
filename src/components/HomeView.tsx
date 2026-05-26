@@ -139,6 +139,8 @@ export default function HomeView({ onGoDriver }: Props) {
   const [route, setRoute] = useState<Array<[number, number]>>([])
   const [stats, setStats] = useState<{ distanceKm: number; durationMin: number } | null>(null)
   const [resetMap, setResetMap] = useState(false)
+  const [userChoseOrigin, setUserChoseOrigin] = useState(false)
+  const [gpsCoords, setGpsCoords] = useState<Coordinates | null>(null)
 
   useEffect(() => {
     if (originCoords && destinationCoords) {
@@ -175,6 +177,12 @@ export default function HomeView({ onGoDriver }: Props) {
     else sessionStorage.removeItem('ag_destination_address')
   }, [destinationAddress])
 
+  useEffect(() => {
+    if (!userChoseOrigin && gpsCoords) {
+      setOriginCoords(gpsCoords)
+    }
+  }, [gpsCoords, userChoseOrigin])
+
   return (
     <div className="home">
       <header className="home__top">
@@ -192,7 +200,9 @@ export default function HomeView({ onGoDriver }: Props) {
             onReset={() => {
               setResetMap(true)
               setTimeout(() => setResetMap(false), 100)
+              setUserChoseOrigin(false)
             }}
+            onOriginManuallyChosen={() => setUserChoseOrigin(true)}
           />
         </div>
         <button type="button" className="home__avatar" aria-label="Perfil">
@@ -222,6 +232,8 @@ export default function HomeView({ onGoDriver }: Props) {
           route={route}
           stats={stats}
           resetMap={resetMap}
+          userChoseOrigin={userChoseOrigin}
+          onGpsCoordsChange={setGpsCoords}
         />
       </section>
 
