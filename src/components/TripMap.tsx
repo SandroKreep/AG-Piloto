@@ -268,6 +268,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
   const [gpsCoords, setGpsCoords] = useState<Coordinates | null>(null) // Track GPS coordinates
 
   const mapRef = useRef<L.Map>(null); // Add map ref
+  const originMarkerRef = useRef<L.Marker | null>(null);
   const destinationMarkerRef = useRef<L.Marker | null>(null);
   const routeLayerRef = useRef<L.Polyline | null>(null);
 
@@ -440,6 +441,35 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
     }
   }, [activeTrip])
 
+  // Effect to manage origin marker imperatively
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Remove existing marker
+    if (originMarkerRef.current) {
+      originMarkerRef.current.remove();
+      originMarkerRef.current = null;
+    }
+
+    // Add new marker if origin exists
+    if (originCoords) {
+      const marker = L.marker([originCoords.lat, originCoords.lng], {
+        icon: createOriginIcon()
+      }).addTo(mapRef.current);
+
+      marker.bindPopup('Origem escolhida');
+
+      originMarkerRef.current = marker;
+    }
+
+    return () => {
+      if (originMarkerRef.current) {
+        originMarkerRef.current.remove();
+        originMarkerRef.current = null;
+      }
+    };
+  }, [originCoords, mapRef.current]);
+
   // Effect to manage destination marker imperatively
   useEffect(() => {
     if (!mapRef.current) return;
@@ -502,6 +532,11 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
   // Effect to remove markers and route when both coords are null
   useEffect(() => {
     if (!originCoords && !destinationCoords) {
+      // Remove marker de origem se existir
+      if (originMarkerRef.current) {
+        originMarkerRef.current.remove()
+        originMarkerRef.current = null
+      }
       // Remove marker de destino se existir
       if (destinationMarkerRef.current) {
         destinationMarkerRef.current.remove()
@@ -524,6 +559,10 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
       setStats(null)
       setError(null)
       localStorage.removeItem('activeTripId')
+      if (originMarkerRef.current) {
+        originMarkerRef.current.remove()
+        originMarkerRef.current = null
+      }
       if (destinationMarkerRef.current) {
         destinationMarkerRef.current.remove()
         destinationMarkerRef.current = null
@@ -594,13 +633,6 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
           {activeTrip && activeTrip.destination_lat && activeTrip.destination_lng && isValidLuandaCoordinate(activeTrip.destination_lat, activeTrip.destination_lng) && (
             <Marker position={[activeTrip.destination_lat, activeTrip.destination_lng]} icon={iconeDestino}>
               <Popup>Destino: {activeTrip.destination_address}</Popup>
-            </Marker>
-          )}
-          {originCoords && gpsCoords && 
-           (Math.abs(originCoords.lat - gpsCoords.lat) > 0.0001 || 
-            Math.abs(originCoords.lng - gpsCoords.lng) > 0.0001) && (
-            <Marker position={[originCoords.lat, originCoords.lng]} icon={createOriginIcon()}>
-              <Popup>Origem escolhida</Popup>
             </Marker>
           )}
           <MyLocationMarker activeTripId={activeTripId} setOriginCoords={setOriginCoords} setGpsCoords={setGpsCoords} />
