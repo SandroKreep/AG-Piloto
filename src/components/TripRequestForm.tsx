@@ -194,7 +194,7 @@ export default function TripRequestForm({
   const destinoFixo = useRef(sessionStorage.getItem('ag_destination_coords') !== null)
   const originCoordsRef = useRef<{ lat: number; lng: number } | null>(null)
   const originFixed = useRef(sessionStorage.getItem('ag_origin_coords') !== null)
-  const routeTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const routeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const originLockedRef = useRef(false)
 
   const buscarSugestoes = (texto: string) => {
