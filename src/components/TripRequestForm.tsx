@@ -256,6 +256,14 @@ export default function TripRequestForm({
         const data = await res.json()
         setOriginSuggestions(data)
         setShowOriginSuggestions(true)
+        
+        // Geocode the first result to update originCoords immediately
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat)
+          const lng = parseFloat(data[0].lon)
+          originCoordsRef.current = { lat, lng }
+          setOriginCoords({ lat, lng })
+        }
       } catch (err) {
         console.error('Erro autocomplete origem:', err)
       } finally {
@@ -299,8 +307,8 @@ export default function TripRequestForm({
           const currentLat = position.coords.latitude;
           const currentLng = position.coords.longitude;
           
-          // Só actualiza origem se ainda não escolheu destino, não fixou origem manualmente, e origem não está bloqueada
-          if (!destinoFixo.current && !originFixed.current && !originLockedRef.current) {
+          // Só actualiza origem se ainda não escolheu destino, não fixou origem manualmente, origem não está bloqueada, e utilizador não editou origem manualmente
+          if (!destinoFixo.current && !originFixed.current && !originLockedRef.current && !userEditedOrigin) {
             setLatitude(currentLat);
             setLongitude(currentLng);
             originCoordsRef.current = { lat: currentLat, lng: currentLng };
@@ -344,7 +352,7 @@ export default function TripRequestForm({
 
   // Reusable route calculation function
   const calcularRota = async (origem?: Coordinates, destino?: Coordinates) => {
-    const origin = origem || originCoords || originCoordsRef.current || (latitude && longitude ? { lat: latitude, lng: longitude } : null)
+    const origin = origem || originCoords || originCoordsRef.current
     const dest = destino || destinationCoords
     
     if (!origin || !dest) {
