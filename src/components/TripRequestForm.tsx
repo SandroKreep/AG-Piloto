@@ -194,6 +194,8 @@ export default function TripRequestForm({
   const destinoFixo = useRef(sessionStorage.getItem('ag_destination_coords') !== null)
   const originCoordsRef = useRef<{ lat: number; lng: number } | null>(null)
   const originFixed = useRef(sessionStorage.getItem('ag_origin_coords') !== null)
+  const routeTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const originLockedRef = useRef(false)
 
   const buscarSugestoes = (texto: string) => {
     setDestinoTexto(texto)
@@ -227,6 +229,7 @@ export default function TripRequestForm({
     
     // Bloqueia actualizações GPS e limpa watch
     destinoFixo.current = true
+    originLockedRef.current = true
     if (watchId.current !== null) {
       navigator.geolocation.clearWatch(watchId.current)
       watchId.current = null
@@ -271,6 +274,7 @@ export default function TripRequestForm({
     
     // Bloqueia actualizações GPS e limpa watch
     originFixed.current = true
+    originLockedRef.current = true
     if (watchId.current !== null) {
       navigator.geolocation.clearWatch(watchId.current)
       watchId.current = null
@@ -295,8 +299,8 @@ export default function TripRequestForm({
           const currentLat = position.coords.latitude;
           const currentLng = position.coords.longitude;
           
-          // Só actualiza origem se ainda não escolheu destino e não fixou origem manualmente
-          if (!destinoFixo.current && !originFixed.current) {
+          // Só actualiza origem se ainda não escolheu destino, não fixou origem manualmente, e origem não está bloqueada
+          if (!destinoFixo.current && !originFixed.current && !originLockedRef.current) {
             setLatitude(currentLat);
             setLongitude(currentLng);
             originCoordsRef.current = { lat: currentLat, lng: currentLng };
@@ -369,9 +373,16 @@ export default function TripRequestForm({
     }
   }
 
-  // Effect to calculate route when destination changes (not GPS)
+  // Effect to calculate route when destination changes (not GPS) - with debounce
   useEffect(() => {
-    calcularRota()
+    if (routeTimerRef.current) clearTimeout(routeTimerRef.current)
+    routeTimerRef.current = setTimeout(() => {
+      calcularRota()
+    }, 1500)
+
+    return () => {
+      if (routeTimerRef.current) clearTimeout(routeTimerRef.current)
+    }
   }, [destinationCoords, originCoords])
 
   // Save originAddress to sessionStorage when it changes
@@ -653,6 +664,7 @@ export default function TripRequestForm({
           destinoFixo.current = false
           originCoordsRef.current = null
           originFixed.current = false
+          originLockedRef.current = false
           // Reset origin autocomplete states
           setOriginSuggestions([])
           setShowOriginSuggestions(false)
