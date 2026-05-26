@@ -183,7 +183,14 @@ export default function Farmacia() {
       <header className="farmacia__header">
         <div className="farmacia__header-content">
           <div className="farmacia__logo">
-            💊
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '8px' }}>
+              <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
+              <path d="M8.5 8.5v.01"></path>
+              <path d="M16 16v.01"></path>
+              <path d="M12 12v.01"></path>
+              <path d="M8.5 15.5v.01"></path>
+              <path d="M15.5 8.5v.01"></path>
+            </svg>
             <h1>Farmácia AG-PILOTO</h1>
           </div>
           <p className="farmacia__subtitle">Medicamentos entregues por motoqueiro em Luanda</p>
@@ -196,12 +203,23 @@ export default function Farmacia() {
             onChange={(e) => setBusca(e.target.value)}
             className="farmacia__search-input"
           />
-          <span className="farmacia__search-icon">🔍</span>
+          <span className="farmacia__search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
         </div>
       </header>
 
       <div className="farmacia__banner">
-        🚀 Entrega rápida em Luanda · Pague na entrega
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+          <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+        </svg>
+        Entrega rápida em Luanda · Pague na entrega
       </div>
 
       <div className="farmacia__filters">
@@ -230,7 +248,16 @@ export default function Farmacia() {
                 {medicamento.imagem_url ? (
                   <img src={medicamento.imagem_url} alt={medicamento.nome} />
                 ) : (
-                  <div className="farmacia__card-image-placeholder">💊</div>
+                  <div className="farmacia__card-image-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
+                      <path d="M8.5 8.5v.01"></path>
+                      <path d="M16 16v.01"></path>
+                      <path d="M12 12v.01"></path>
+                      <path d="M8.5 15.5v.01"></path>
+                      <path d="M15.5 8.5v.01"></path>
+                    </svg>
+                  </div>
                 )}
               </div>
               <span className="farmacia__card-category">{medicamento.categoria}</span>
@@ -255,7 +282,15 @@ export default function Farmacia() {
       )}
 
       <footer className="farmacia__footer">
-        💊 Farmácia AG-PILOTO · Entregamos em toda Luanda
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+          <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
+          <path d="M8.5 8.5v.01"></path>
+          <path d="M16 16v.01"></path>
+          <path d="M12 12v.01"></path>
+          <path d="M8.5 15.5v.01"></path>
+          <path d="M15.5 8.5v.01"></path>
+        </svg>
+        Farmácia AG-PILOTO · Entregamos em toda Luanda
       </footer>
 
       {modal.isOpen && modal.medicamento && (
@@ -264,7 +299,10 @@ export default function Farmacia() {
             <div className="farmacia__modal-header">
               <h2>{modal.medicamento.nome}</h2>
               <button className="farmacia__modal-close" onClick={handleCloseModal}>
-                ✕
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             </div>
 

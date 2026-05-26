@@ -191,7 +191,7 @@ export default function Documentos() {
 
       if (error) throw error
 
-      setMessage({ type: 'success', text: '✅ Pedido enviado! O motoqueiro chegará em breve.' })
+      setMessage({ type: 'success', text: 'Pedido enviado! O motoqueiro chegará em breve.' })
       setFormData({
         descricao: '',
         origemAddress: '',
@@ -230,7 +230,12 @@ export default function Documentos() {
       </button>
       <header className="documentos-page__header">
         <span className="documentos-page__badge">AG-PILOTO</span>
-        <h1 className="documentos-page__title">📄 Serviço de Documentos</h1>
+        <h1 className="documentos-page__title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '8px' }}>
+            <path d="M9 4h6l3 3v11a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2zM9 10h6M9 14h4" />
+          </svg>
+          Serviço de Documentos
+        </h1>
         <p className="documentos-page__subtitle">Levantamento e entrega de documentos com segurança em Luanda</p>
       </header>
 

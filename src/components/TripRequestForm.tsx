@@ -437,19 +437,19 @@ export default function TripRequestForm({
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'trips', filter: `id=eq.${activeTripId}` },
         (payload: any) => {
-          console.log('🔍 DEBUG: Trip update received:', payload)
-          console.log('🔍 DEBUG: New status:', payload.new.status)
-          console.log('🔍 DEBUG: Expected: ASSIGNED, Got:', payload.new.status)
+          console.log('DEBUG: Trip update received:', payload)
+          console.log('DEBUG: New status:', payload.new.status)
+          console.log('DEBUG: Expected: ASSIGNED, Got:', payload.new.status)
           
           if (payload.new.status === 'ASSIGNED') {
-            console.log('🎯 SUCCESS: Trip accepted!')
+            console.log('SUCCESS: Trip accepted!')
             setTripAccepted(true)
             setAcceptedDriver(payload.new.driverId || 'Motorista')
             setWaitingSeconds(0)
             console.log('Trip accepted!', payload.new)
             
             // Send notification
-            sendNotification('✓ Pedido Aceito!', {
+            sendNotification('Pedido Aceito!', {
               body: 'Seu motorista está a caminho',
               icon: '✓',
               badge: '🚗',
@@ -736,7 +736,11 @@ export default function TripRequestForm({
       
       {gpsObtained && (
         <div className="gps-obtido" style={{ marginBottom: '10px', textAlign: 'center' }}>
-          ✓ Localização GPS obtida!
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          Localização GPS obtida!
         </div>
       )}
       
@@ -750,8 +754,13 @@ export default function TripRequestForm({
       )}
 
       {!destinationCoords && (
-        <div style={{ color: '#F97316', marginBottom: '10px', textAlign: 'center', fontWeight: '500' }}>
-          ⚠ Selecione um destino no mapa
+        <div style={{ color: '#F97316', marginBottom: '10px', textAlign: 'center', fontWeight: '500', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          Selecione um destino no mapa
         </div>
       )}
 
@@ -780,9 +789,11 @@ export default function TripRequestForm({
             right: '10px',
             top: '50%',
             transform: 'translateY(-50%)',
-            fontSize: '16px'
           }}>
-            ⏳
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="trip-form__spinner">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" />
+              <path d="M12 2a10 10 0 0 1 10 10" />
+            </svg>
           </div>
         )}
         {showOriginSuggestions && originSuggestions.length > 0 && (
@@ -804,11 +815,15 @@ export default function TripRequestForm({
               <div
                 key={s.place_id}
                 onClick={() => selecionarSugestaoOrigem(s)}
-                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px' }}
+                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
               >
-                📍 {s.display_name}
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                {s.display_name}
               </div>
             ))}
           </div>
@@ -834,11 +849,15 @@ export default function TripRequestForm({
               <div
                 key={s.place_id}
                 onClick={() => selecionarSugestao(s)}
-                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px' }}
+                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
               >
-                📍 {s.display_name}
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                {s.display_name}
               </div>
             ))}
           </div>
@@ -892,10 +911,18 @@ export default function TripRequestForm({
           fontSize: '14px',
           cursor: 'pointer',
           width: '100%',
-          marginTop: '-8px'
+          marginTop: '-8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px'
         }}
       >
-        🔄 Nova Viagem
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+          <path d="M3 3v5h5"></path>
+        </svg>
+        Nova Viagem
       </button>
     </form>
   )

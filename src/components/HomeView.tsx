@@ -52,18 +52,19 @@ function ServiceIcon({ item }: { item: ServiceItem }) {
       case 'cup':
         return (
           <path
-            d="M8 4v14M12 4c0 3.5-1.5 6.5-3 8M16 4c0 4 2 8 4 9"
+            d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
+            strokeLinejoin="round"
             fill="none"
           />
         )
       case 'cross':
         return (
           <>
-            <path d="M12 8v8M9 11h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <rect x="6" y="5" width="12" height="14" rx="2" stroke="currentColor" strokeWidth="1.4" fill="none" />
+            <path d="M12 8v8M9 11h6" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" />
+            <rect x="6" y="5" width="12" height="14" rx="2" stroke="#16a34a" strokeWidth="2" fill="none" />
           </>
         )
       case 'bag':
@@ -89,14 +90,12 @@ function ServiceIcon({ item }: { item: ServiceItem }) {
         )
       case 'truck':
         return (
-          <path
-            d="M4 16h2l1-5h9l1 5h2M5 16v2h14v-2M7 11l1-5h8l1 5"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
+          <>
+            <rect x="2" y="8" width="13" height="8" rx="1" stroke="currentColor" strokeWidth="1.4" fill="none" />
+            <path d="M15 12h4l2-4v8h-6v-4z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <circle cx="6" cy="18" r="2" stroke="currentColor" strokeWidth="1.4" fill="none" />
+            <circle cx="18" cy="18" r="2" stroke="currentColor" strokeWidth="1.4" fill="none" />
+          </>
         )
     }
   })()

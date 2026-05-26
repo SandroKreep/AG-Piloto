@@ -295,21 +295,49 @@ export default function DriverApplications() {
                       onClick={() => openDocument(application.bi_front_url, 'BI - Frente')}
                       disabled={loadingUrls.has(application.bi_front_url)}
                     >
-                      {loadingUrls.has(application.bi_front_url) ? '⏳' : '📄'} BI Frente
+                      {loadingUrls.has(application.bi_front_url) ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                          <path d="M12 2a10 10 0 0 1 10 10" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <path d="M9 4h6l3 3v11a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2zM9 10h6M9 14h4" />
+                        </svg>
+                      )} BI Frente
                     </button>
                     <button
                       className="document-btn"
                       onClick={() => openDocument(application.bi_back_url, 'BI - Verso')}
                       disabled={loadingUrls.has(application.bi_back_url)}
                     >
-                      {loadingUrls.has(application.bi_back_url) ? '⏳' : '📄'} BI Verso
+                      {loadingUrls.has(application.bi_back_url) ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                          <path d="M12 2a10 10 0 0 1 10 10" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <path d="M9 4h6l3 3v11a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2zM9 10h6M9 14h4" />
+                        </svg>
+                      )} BI Verso
                     </button>
                     <button
                       className="document-btn"
                       onClick={() => openDocument(application.photo_4x4_url, 'Foto 4x4')}
                       disabled={loadingUrls.has(application.photo_4x4_url)}
                     >
-                      {loadingUrls.has(application.photo_4x4_url) ? '⏳' : '👤'} Foto 4x4
+                      {loadingUrls.has(application.photo_4x4_url) ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                          <path d="M12 2a10 10 0 0 1 10 10" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      )} Foto 4x4
                     </button>
                   </div>
                 </div>
@@ -334,14 +362,34 @@ export default function DriverApplications() {
                       onClick={() => updateApplicationStatus(application.id, 'approved')}
                       disabled={updatingStatus.has(application.id)}
                     >
-                      {updatingStatus.has(application.id) ? '⏳' : '✅'} Aprovar
+                      {updatingStatus.has(application.id) ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                          <path d="M12 2a10 10 0 0 1 10 10" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      )} Aprovar
                     </button>
                     <button
                       className="reject-btn"
                       onClick={() => updateApplicationStatus(application.id, 'rejected')}
                       disabled={updatingStatus.has(application.id)}
                     >
-                      {updatingStatus.has(application.id) ? '⏳' : '❌'} Rejeitar
+                      {updatingStatus.has(application.id) ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                          <path d="M12 2a10 10 0 0 1 10 10" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="15" y1="9" x2="9" y2="15"></line>
+                          <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                      )} Rejeitar
                     </button>
                   </div>
                 )}

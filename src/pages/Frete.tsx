@@ -300,7 +300,7 @@ export default function Frete() {
 
       if (error) throw error
 
-      setMessage({ type: 'success', text: '✅ Pedido enviado! Entraremos em contacto via WhatsApp.' })
+      setMessage({ type: 'success', text: 'Pedido enviado! Entraremos em contacto via WhatsApp.' })
       setFormData({
         descricao: '',
         origemAddress: '',
@@ -482,7 +482,20 @@ export default function Frete() {
 
         {routeStats && (
           <div className="frete-page__route-info">
-            📏 {routeStats.distanceKm.toFixed(1)} km · ⏱️ {routeStats.durationMin.toFixed(0)} min · 💰 Estimativa: {estimatedPrice?.price.toLocaleString('pt-AO')} Kz
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+              <path d="M2 12h20M2 12l4-4M2 12l4 4M22 12l-4-4M22 12l-4 4"></path>
+            </svg>
+            {routeStats.distanceKm.toFixed(1)} km · 
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px', marginLeft: '4px' }}>
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            {routeStats.durationMin.toFixed(0)} min · 
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px', marginLeft: '4px' }}>
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            Estimativa: {estimatedPrice?.price.toLocaleString('pt-AO')} Kz
           </div>
         )}
 

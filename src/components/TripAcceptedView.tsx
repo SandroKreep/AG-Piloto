@@ -64,7 +64,12 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
     <div className="trip-accepted-view">
       <div className="trip-accepted-header">
         <div className="trip-accepted-info">
-          <p>🏍️ Motoqueiro está a caminho para buscar você</p>
+          <p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '8px' }}>
+              <path d="M5 17h-2v-5l2.5-3h3l2 3h5v5M9 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm8 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+            </svg>
+            Motoqueiro está a caminho para buscar você
+          </p>
         </div>
         <button className="close-btn" onClick={onNewTrip}>
           <X size={20} />
@@ -114,29 +119,63 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
               </div>
             ) : tripDetails ? (
               <div className="info-card">
-                <h3>📍 Informações da Viagem</h3>
+                <h3>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '8px' }}>
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  Informações da Viagem
+                </h3>
                 <div className="info-item">
-                  <span className="info-label">💰 Preço:</span>
+                  <span className="info-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    Preço:
+                  </span>
                   <span className="info-value">{tripDetails.quoted_price ? formatCurrency(tripDetails.quoted_price) : 'A calcular'}</span>
                 </div>
                 {routeInfo && (
                   <>
                     <div className="info-item">
-                      <span className="info-label">📏 Distância:</span>
+                      <span className="info-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
+                          <path d="M2 12h20M2 12l4-4M2 12l4 4M22 12l-4-4M22 12l-4 4"></path>
+                        </svg>
+                        Distância:
+                      </span>
                       <span className="info-value">{routeInfo.distanceKm} km</span>
                     </div>
                     <div className="info-item">
-                      <span className="info-label">⏱️ Tempo estimado:</span>
+                      <span className="info-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Tempo estimado:
+                      </span>
                       <span className="info-value">{routeInfo.durationMin} min</span>
                     </div>
                   </>
                 )}
                 <div className="info-item">
-                  <span className="info-label">📍 Origem:</span>
+                  <span className="info-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Origem:
+                  </span>
                   <span className="info-value">{tripDetails.origin_address ? tripDetails.origin_address.substring(0, 30) + (tripDetails.origin_address.length > 30 ? '...' : '') : 'N/A'}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">🏁 Destino:</span>
+                  <span className="info-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
+                      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    </svg>
+                    Destino:
+                  </span>
                   <span className="info-value">{tripDetails.destination_address ? tripDetails.destination_address.substring(0, 30) + (tripDetails.destination_address.length > 30 ? '...' : '') : 'N/A'}</span>
                 </div>
                 <div className="info-item">

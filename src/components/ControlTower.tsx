@@ -105,7 +105,7 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lng: numb
 function buildTripIcon() {
   return L.divIcon({
     className: 'trip-icon',
-    html: '<div style="display: flex; align-items: center; justify-content: center;">📍</div>',
+    html: '<div style="display: flex; align-items: center; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>',
     iconSize: [24, 24],
     iconAnchor: [12, 12],
   })
@@ -524,13 +524,22 @@ function ControlTower({ vehicles }: Props) {
             className={`tab-button ${activeTab === 'trips' ? 'active' : ''}`}
             onClick={() => setActiveTab('trips')}
           >
-            🚗 Pedidos
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
+              <path d="M5 17h-2v-5l2.5-3h3l2 3h5v5M9 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm8 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+            </svg>
+            Pedidos
           </button>
           <button
             className={`tab-button ${activeTab === 'fretes' ? 'active' : ''}`}
             onClick={() => setActiveTab('fretes')}
           >
-            🚚 Fretes
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
+              <rect x="2" y="8" width="13" height="8" rx="1" />
+              <path d="M15 12h4l2-4v8h-6v-4z" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="6" cy="18" r="2" />
+              <circle cx="18" cy="18" r="2" />
+            </svg>
+            Fretes
           </button>
         </div>
         

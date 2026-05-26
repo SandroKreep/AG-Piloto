@@ -401,12 +401,19 @@ export default function CandidaturaPage() {
                           className="remove-preview"
                           onClick={() => removePreview('bi_front')}
                         >
-                          ✕
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
                         </button>
                       </div>
                     ) : (
                       <div className="upload-placeholder">
-                        <span className="upload-icon">📄</span>
+                        <span className="upload-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 4h6l3 3v11a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2zM9 10h6M9 14h4" />
+                          </svg>
+                        </span>
                         <span>BI Frente</span>
                         <small>JPG ou PNG (máx. 5MB)</small>
                       </div>
@@ -415,7 +422,10 @@ export default function CandidaturaPage() {
                 </div>
                 {formData.bi_front_url && (
                   <div className="file-success">
-                    ✅ BI Frente enviado
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    BI Frente enviado
                   </div>
                 )}
               </div>
@@ -453,12 +463,19 @@ export default function CandidaturaPage() {
                           className="remove-preview"
                           onClick={() => removePreview('bi_back')}
                         >
-                          ✕
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
                         </button>
                       </div>
                     ) : (
                       <div className="upload-placeholder">
-                        <span className="upload-icon">📄</span>
+                        <span className="upload-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 4h6l3 3v11a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2zM9 10h6M9 14h4" />
+                          </svg>
+                        </span>
                         <span>BI Verso</span>
                         <small>JPG ou PNG (máx. 5MB)</small>
                       </div>
@@ -467,7 +484,10 @@ export default function CandidaturaPage() {
                 </div>
                 {formData.bi_back_url && (
                   <div className="file-success">
-                    ✅ BI Verso enviado
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    BI Verso enviado
                   </div>
                 )}
               </div>
@@ -505,12 +525,20 @@ export default function CandidaturaPage() {
                           className="remove-preview"
                           onClick={() => removePreview('photo_4x4')}
                         >
-                          ✕
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
                         </button>
                       </div>
                     ) : (
                       <div className="upload-placeholder">
-                        <span className="upload-icon">👤</span>
+                        <span className="upload-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                          </svg>
+                        </span>
                         <span>Foto 4x4</span>
                         <small>JPG ou PNG (máx. 5MB)</small>
                       </div>
@@ -519,7 +547,10 @@ export default function CandidaturaPage() {
                 </div>
                 {formData.photo_4x4_url && (
                   <div className="file-success">
-                    ✅ Foto 4x4 enviada
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Foto 4x4 enviada
                   </div>
                 )}
               </div>

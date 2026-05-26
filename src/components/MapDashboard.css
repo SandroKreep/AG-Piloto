@@ -1,9 +1,10 @@
 .map-dashboard {
   margin-top: 20px;
-  border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 16px;
-  padding: 16px;
-  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
 }
 
 .map-dashboard__header {
@@ -49,26 +50,36 @@
 }
 
 .map-dashboard__tabs button {
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 6px 10px;
-  background: #fff;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  background: var(--bg-card);
   font-weight: 600;
   flex-shrink: 0;
   font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.map-dashboard__tabs button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .map-dashboard__tabs button.is-active {
-  background: #111827;
+  background: var(--primary-gradient);
   color: #fff;
-  border-color: #111827;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-button);
 }
 
 .control-tower {
-  border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 12px;
-  padding: 12px;
-  background: #f9fafb;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  background: var(--bg-card-soft);
+  box-shadow: var(--shadow-soft);
 }
 
 .control-tower__header {
@@ -112,10 +123,11 @@
 }
 
 .trip-table {
-  border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 12px;
-  padding: 10px;
-  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .trip-table__header {
@@ -155,9 +167,9 @@
 .trip-table th,
 .trip-table td {
   text-align: left;
-  padding: 8px;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 0.82rem;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.85rem;
 }
 
 .trip-table__actions {
@@ -167,11 +179,22 @@
 
 .trip-table__actions button,
 .trip-table__pagination button {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-medium);
   border-radius: 8px;
-  padding: 6px 8px;
-  background: #fff;
-  font-size: 0.78rem;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.trip-table__actions button:hover,
+.trip-table__pagination button:hover {
+  background: var(--bg-card-soft);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .trip-table__pagination {
@@ -184,10 +207,11 @@
 }
 
 .financial-summary {
-  border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 12px;
-  background: #fff;
-  padding: 12px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
 }
 
 .financial-summary h3 {
@@ -200,9 +224,16 @@
 }
 
 .financial-summary__grid article {
-  border-radius: 10px;
-  padding: 10px;
-  background: #f8fafc;
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--bg-card-soft);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-normal);
+}
+
+.financial-summary__grid article:hover {
+  border-color: var(--border-medium);
+  transform: translateY(-2px);
 }
 
 .financial-summary__grid p {
@@ -218,10 +249,11 @@
 }
 
 .school-tab {
-  border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 12px;
-  background: #fff;
-  padding: 12px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
 }
 
 .school-tab h3 {
@@ -237,9 +269,16 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 10px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 12px;
+  background: var(--bg-card-soft);
+  transition: all var(--transition-normal);
+}
+
+.school-tab__row:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-card);
 }
 
 .school-tab__row p,

@@ -10,14 +10,14 @@
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .driver-applications-loading .spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #ff6b35;
+  border: 4px solid var(--border-light);
+  border-top: 4px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
@@ -33,9 +33,9 @@
 }
 
 .applications-header h2 {
-  color: #333;
+  color: var(--text);
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0 0 24px 0;
 }
 
@@ -47,32 +47,32 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--bg-card);
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   text-align: center;
-  border: 1px solid #e0e0e0;
-  transition: transform 0.2s;
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-normal);
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .stat-number {
   display: block;
   font-size: 32px;
-  font-weight: 700;
-  color: #ff6b35;
+  font-weight: 800;
+  color: var(--primary);
   margin-bottom: 4px;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #666;
-  font-weight: 500;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 .applications-list {
@@ -84,9 +84,10 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
 }
 
 .empty-state .empty-icon {
@@ -96,30 +97,30 @@
 }
 
 .empty-state h3 {
-  color: #333;
+  color: var(--text);
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 8px 0;
 }
 
 .empty-state p {
-  color: #666;
+  color: var(--text-muted);
   font-size: 16px;
   margin: 0;
 }
 
 .application-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition: all 0.2s;
-  border: 1px solid #e0e0e0;
+  transition: all var(--transition-normal);
+  border: 1px solid var(--border-light);
 }
 
 .application-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .application-header {
@@ -127,33 +128,34 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 20px 24px;
-  background: #fafafa;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--bg-card-soft);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .applicant-info h3 {
-  color: #333;
+  color: var(--text);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 8px 0;
 }
 
 .whatsapp-link {
-  color: #ff6b35;
+  color: var(--primary);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
-  border-radius: 6px;
-  transition: all 0.2s;
+  border-radius: var(--radius);
+  transition: all var(--transition-normal);
 }
 
 .whatsapp-link:hover {
-  background: #ff6b35;
-  color: white;
-  transform: translateY(-1px);
+  background: var(--primary-gradient);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-button);
 }
 
 .application-status {
@@ -176,9 +178,9 @@
 }
 
 .document-section h4 {
-  color: #333;
+  color: var(--text);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 16px 0;
 }
 
@@ -190,14 +192,14 @@
 
 .document-btn {
   padding: 10px 16px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  background: var(--bg-card-soft);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
   font-size: 14px;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -205,10 +207,11 @@
 }
 
 .document-btn:hover:not(:disabled) {
-  background: #ff6b35;
-  color: white;
-  border-color: #ff6b35;
-  transform: translateY(-1px);
+  background: var(--primary-gradient);
+  color: var(--white);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-button);
 }
 
 .document-btn:disabled {
@@ -222,8 +225,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: #fafafa;
-  border-top: 1px solid #e0e0e0;
+  background: var(--bg-card-soft);
+  border-top: 1px solid var(--border-light);
 }
 
 .application-date {
@@ -233,7 +236,7 @@
 }
 
 .application-date small {
-  color: #666;
+  color: var(--text-muted);
   font-size: 12px;
   line-height: 1.4;
 }
@@ -245,44 +248,44 @@
 
 .approve-btn {
   padding: 8px 16px;
-  background: #28a745;
-  color: white;
+  background: #16a34a;
+  color: var(--white);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .approve-btn:hover:not(:disabled) {
-  background: #218838;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  background: #15803d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
 
 .reject-btn {
   padding: 8px 16px;
-  background: #dc3545;
-  color: white;
+  background: #dc2626;
+  color: var(--white);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .reject-btn:hover:not(:disabled) {
-  background: #c82333;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  background: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
 .approve-btn:disabled,
@@ -404,7 +407,7 @@
 
 /* Animation for new applications */
 .application-card.new {
-  animation: slideInRight 0.5s ease-out;
+  animation: slideInRight var(--transition-normal);
 }
 
 @keyframes slideInRight {
@@ -454,7 +457,7 @@
 .document-btn:focus,
 .approve-btn:focus,
 .reject-btn:focus {
-  outline: 2px solid #ff6b35;
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 

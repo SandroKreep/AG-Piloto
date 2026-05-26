@@ -13,7 +13,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--bg-page);
+  background: transparent;
   position: relative;
 }
 
@@ -29,14 +29,14 @@
 /* Telefone: barra inferior; conteúdo identado como app */
 @media (max-width: 767.98px) {
   .app-root {
-    background: #ececec;
+    background: transparent;
   }
 }
 
 /* PC / tablet largo: site, cabeçalho no topo, sem barra inferior, conteúdo centrado e largo */
 @media (min-width: 768px) {
   .app-root {
-    background: #f0f0f0;
+    background: transparent;
   }
 
   .app-main {

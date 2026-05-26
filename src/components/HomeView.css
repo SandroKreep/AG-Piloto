@@ -117,21 +117,52 @@
 }
 
 .svc-card {
-  background: var(--bg-card-soft);
+  background: var(--bg-card);
   border-radius: var(--radius-lg);
-  padding: 16px 14px;
+  padding: 18px 16px;
   box-shadow: var(--shadow-card);
-  border: 1px solid rgba(17, 24, 39, 0.04);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.svc-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-gradient);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.svc-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--border-medium);
+}
+
+.svc-card:hover::before {
+  opacity: 1;
 }
 
 .svc-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  transition: transform var(--transition-normal);
+}
+
+.svc-card:hover .svc-icon {
+  transform: scale(1.1);
 }
 
 .svc-icon--peach {
@@ -179,11 +210,24 @@
 }
 
 .recruit-card {
-  background: var(--white);
+  background: var(--bg-card);
   border-radius: var(--radius-lg);
-  padding: 18px 16px;
+  padding: 20px 18px;
   box-shadow: var(--shadow-card);
-  border: 1px solid rgba(17, 24, 39, 0.06);
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.recruit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--primary-gradient);
 }
 
 .recruit-card__body {
@@ -251,18 +295,24 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 24px;
+  padding: 14px 28px;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-gradient);
   color: var(--white);
   font-size: 1rem;
   font-weight: 700;
   border: none;
-  box-shadow: 0 4px 16px rgba(255, 107, 0, 0.35);
+  box-shadow: var(--shadow-button);
+  transition: all var(--transition-normal);
+}
+
+.recruit-card__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 0, 0.4);
 }
 
 .recruit-card__cta:active {
-  transform: scale(0.99);
+  transform: translateY(0);
 }
 
 .recruit-card__arrow {

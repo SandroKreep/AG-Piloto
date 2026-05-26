@@ -78,7 +78,7 @@ export default function FretesTab({ fretes }: Props) {
                   <span className="fretes-tab__label">WhatsApp:</span>
                   <a
                     href={`https://wa.me/${frete.whatsapp?.replace(/\D/g, '')}?text=${encodeURIComponent(
-                      `Olá! Somos da AG-PILOTO 🚚\nEm resposta ao seu pedido de frete:\nDe: ${frete.origem_address}\nPara: ${frete.destino_address}\nValor estimado: ${frete.quoted_price ? frete.quoted_price.toLocaleString('pt-AO') : 'A definir'} Kz\nVamos tratar do seu pedido. Podemos confirmar?`
+                      `Olá! Somos da AG-PILOTO\nEm resposta ao seu pedido de frete:\nDe: ${frete.origem_address}\nPara: ${frete.destino_address}\nValor estimado: ${frete.quoted_price ? frete.quoted_price.toLocaleString('pt-AO') : 'A definir'} Kz\nVamos tratar do seu pedido. Podemos confirmar?`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

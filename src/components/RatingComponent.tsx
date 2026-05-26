@@ -114,7 +114,7 @@ export default function RatingComponent({
   if (showSuccess) {
     return (
       <div className="rating-success">
-        <div className="rating-success-icon">✓</div>
+        <div className="rating-success-icon"></div>
         <h3>Avaliação enviada!</h3>
         <p>Obrigado pelo seu feedback</p>
       </div>

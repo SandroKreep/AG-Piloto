@@ -11,7 +11,7 @@ type Props = {
 const createDriverIcon = () => {
   return L.divIcon({
     className: 'driver-icon',
-    html: `<div style="background-color: #ffc107; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 16px;">🚗</div>`,
+    html: `<div style="background-color: #ffc107; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 16px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h-2v-5l2.5-3h3l2 3h5v5M9 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm8 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg></div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14],
   })
