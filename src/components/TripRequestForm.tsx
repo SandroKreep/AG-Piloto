@@ -256,14 +256,6 @@ export default function TripRequestForm({
         const data = await res.json()
         setOriginSuggestions(data)
         setShowOriginSuggestions(true)
-        
-        // Geocode the first result to update originCoords immediately
-        if (data && data.length > 0) {
-          const lat = parseFloat(data[0].lat)
-          const lng = parseFloat(data[0].lon)
-          originCoordsRef.current = { lat, lng }
-          setOriginCoords({ lat, lng })
-        }
       } catch (err) {
         console.error('Erro autocomplete origem:', err)
       } finally {
