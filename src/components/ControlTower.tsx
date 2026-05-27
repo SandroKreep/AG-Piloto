@@ -279,6 +279,10 @@ function ControlTower({ vehicles }: Props) {
   const handleAcceptTrip = async (tripId: string) => {
     console.log('🔧 ADMIN DEBUG: Accepting trip', tripId)
     
+    setTrips(prev => prev.map(t =>
+      t.id === tripId ? { ...t, status: 'ASSIGNED' } : t
+    ))
+
     const { error } = await supabase
       .from('trips')
       .update({ status: 'ASSIGNED' })
