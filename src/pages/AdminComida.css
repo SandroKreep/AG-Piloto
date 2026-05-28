@@ -53,10 +53,20 @@
 }
 
 .admin-comida__msg {
-  color: #16a34a;
-  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 10px;
   font-size: 0.85rem;
-  margin: 0;
+  font-weight: 600;
+  margin: 8px 0;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.admin-comida__msg--error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }
 
 .admin-comida__lista h2 {

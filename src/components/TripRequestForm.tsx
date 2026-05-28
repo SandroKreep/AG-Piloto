@@ -172,6 +172,7 @@ export default function TripRequestForm({
   const [acceptedDriver, setAcceptedDriver] = useState<string | null>(null)
   const [waitingSeconds, setWaitingSeconds] = useState(0)
   const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [successModal, setSuccessModal] = useState(false)
   
   // Autocomplete states for destination
   const [destinoTexto, setDestinoTexto] = useState('')
@@ -626,7 +627,8 @@ export default function TripRequestForm({
       if (gpsFallbackMessage) {
         successMessage += ` (${gpsFallbackMessage})`;
       }
-      alert(successMessage);
+      setSuccessModal(true)
+      setTimeout(() => setSuccessModal(false), 4000)
       setOriginAddress('');
       setDestinationAddress('');
       setServiceType('moto');
@@ -941,6 +943,65 @@ export default function TripRequestForm({
         </svg>
         Nova Viagem
       </button>
+
+      {successModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '24px',
+            padding: '32px 28px',
+            maxWidth: '340px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            animation: 'popIn 0.3s ease',
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              background: 'linear-gradient(135deg, #16a34a, #22c55e)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+              boxShadow: '0 0 0 8px rgba(34,197,94,0.15)',
+              animation: 'pulse 1.5s ease infinite',
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24"
+                fill="none" stroke="white" strokeWidth="3"
+                strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <h3 style={{
+              margin: '0 0 8px',
+              fontSize: '1.2rem',
+              fontWeight: 800,
+              color: '#111827'
+            }}>
+              Pedido enviado!
+            </h3>
+            <p style={{
+              margin: 0,
+              color: '#6b7280',
+              fontSize: '0.9rem'
+            }}>
+              A aguardar motorista disponível...
+            </p>
+          </div>
+        </div>
+      )}
     </form>
   )
 }

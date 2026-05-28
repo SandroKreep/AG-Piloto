@@ -333,6 +333,16 @@
   50% { opacity: 0.5; }
 }
 
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 8px rgba(34,197,94,0.15); }
+  50% { box-shadow: 0 0 0 16px rgba(34,197,94,0.05); }
+}
+
 .gps-obtido {
   color: #16a34a;
   animation: pulse-green 2s ease-in-out infinite;

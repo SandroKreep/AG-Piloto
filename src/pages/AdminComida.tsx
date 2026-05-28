@@ -11,6 +11,7 @@ export default function AdminComida() {
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
+  const [msgType, setMsgType] = useState<'success' | 'error'>('success')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const carregar = async () => {
@@ -58,12 +59,30 @@ export default function AdminComida() {
   const toggleDisponivel = async (id: string, atual: boolean) => {
     await supabase.from('refeicoes')
       .update({ disponivel: !atual }).eq('id', id)
+    setMsg('Estado actualizado!')
+    setMsgType('success')
     await carregar()
+    setTimeout(() => setMsg(''), 3000)
   }
 
   const remover = async (id: string) => {
-    await supabase.from('refeicoes').delete().eq('id', id)
+    console.log('A tentar remover id:', id)
+    const { data, error } = await supabase
+      .from('refeicoes')
+      .delete()
+      .eq('id', id)
+      .select()
+    console.log('Resultado delete:', { data, error })
+    if (error) {
+      setMsg('Erro ao remover: ' + error.message)
+      setMsgType('error')
+      setTimeout(() => setMsg(''), 3000)
+      return
+    }
+    setMsg('Refeição removida com sucesso!')
+    setMsgType('success')
     await carregar()
+    setTimeout(() => setMsg(''), 3000)
   }
 
   return (
@@ -91,7 +110,11 @@ export default function AdminComida() {
           onChange={(e) => setPreco(e.target.value)} />
         <input type="tel" placeholder="WhatsApp (+244...)" value={whatsapp}
           onChange={(e) => setWhatsapp(e.target.value)} />
-        {msg && <p className="admin-comida__msg">{msg}</p>}
+        {msg && (
+          <p className={`admin-comida__msg ${msgType === 'error' ? 'admin-comida__msg--error' : ''}`}>
+            {msg}
+          </p>
+        )}
         <button onClick={adicionar} disabled={loading}>
           {loading ? 'A adicionar...' : 'Adicionar Refeição'}
         </button>
