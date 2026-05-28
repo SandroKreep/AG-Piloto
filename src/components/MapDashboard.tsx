@@ -22,7 +22,7 @@ export default function MapDashboard() {
   const [activeTab, setActiveTab] = useState<'operacoes' | 'fretes'>('operacoes')
   const [message, setMessage] = useState<string | null>(null)
   const [selectedFreteId, setSelectedFreteId] = useState<string | undefined>(undefined)
-  const [selectedTrip, setSelectedTrip] = useState<any>(null)
+  const [selectedTripExternal, setSelectedTripExternal] = useState<any>(null)
   const { token, loading } = useAuthSession()
   const fallbackAdminId = useMemo(() => localStorage.getItem('ag_admin_id') ?? 'admin-demo-id', [])
 
@@ -169,7 +169,7 @@ export default function MapDashboard() {
 
   const handleSelectFrete = useCallback((frete: any) => {
     setSelectedFreteId(frete.id)
-    setSelectedTrip({
+    setSelectedTripExternal({
       id: frete.id,
       status: frete.status,
       service_type: 'frete',
@@ -233,7 +233,7 @@ export default function MapDashboard() {
 
       <div className="map-dashboard__layout">
         <div className="map-dashboard__main">
-          <ControlTower vehicles={vehicles} onSelectFrete={handleSelectFrete} selectedFreteId={selectedFreteId} selectedTrip={selectedTrip} onAcceptTrip={handleAcceptTrip} />
+          <ControlTower vehicles={vehicles} onSelectFrete={handleSelectFrete} selectedFreteId={selectedFreteId} selectedTrip={selectedTripExternal} onTripSelect={(trip) => setSelectedTripExternal(trip)} onAcceptTrip={handleAcceptTrip} />
           <div className="map-dashboard__tabs">
             <button type="button" className={activeTab === 'operacoes' ? 'is-active' : ''} onClick={() => setActiveTab('operacoes')}>
               Pedidos

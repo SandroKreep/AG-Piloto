@@ -61,6 +61,7 @@ type Props = {
   selectedFreteId?: string
   selectedTrip?: Trip | null
   onAcceptTrip?: (tripId: string) => Promise<void>
+  onTripSelect?: (trip: any) => void
 }
 
 function buildVehicleIcon(type: VehicleType) {
@@ -155,7 +156,7 @@ function ServiceIcon({ serviceType }: { serviceType: Trip['service_type'] }) {
   }
 }
 
-function ControlTower({ vehicles, onSelectFrete, selectedFreteId, selectedTrip: externalSelectedTrip, onAcceptTrip }: Props) {
+function ControlTower({ vehicles, onSelectFrete, selectedFreteId, selectedTrip: externalSelectedTrip, onAcceptTrip, onTripSelect }: Props) {
   const [trips, setTrips] = useState<Trip[]>([])
   const [internalSelectedTrip, setInternalSelectedTrip] = useState<Trip | null>(null) // New state for selected trip
   const selectedTrip = externalSelectedTrip ?? internalSelectedTrip
@@ -531,7 +532,12 @@ function ControlTower({ vehicles, onSelectFrete, selectedFreteId, selectedTrip: 
         <div className="sidebar-tabs">
           <button
             className={`tab-button ${activeTab === 'trips' ? 'active' : ''}`}
-            onClick={() => setActiveTab('trips')}
+            onClick={() => {
+              setActiveTab('trips')
+              setInternalSelectedTrip(null)
+              setRoute([])
+              onTripSelect?.(null)  // limpa o external também
+            }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
               <path d="M5 17h-2v-5l2.5-3h3l2 3h5v5M9 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm8 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
@@ -540,7 +546,12 @@ function ControlTower({ vehicles, onSelectFrete, selectedFreteId, selectedTrip: 
           </button>
           <button
             className={`tab-button ${activeTab === 'fretes' ? 'active' : ''}`}
-            onClick={() => setActiveTab('fretes')}
+            onClick={() => {
+              setActiveTab('fretes')
+              setInternalSelectedTrip(null)
+              setRoute([])
+              onTripSelect?.(null)  // limpa o external também
+            }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
               <rect x="2" y="8" width="13" height="8" rx="1" />
@@ -601,6 +612,7 @@ function ControlTower({ vehicles, onSelectFrete, selectedFreteId, selectedTrip: 
                       e.preventDefault() // Previne o comportamento padrão do clique (se houver)
                       e.stopPropagation() // Impede a propagação do evento
                       setInternalSelectedTrip(trip)
+                      onTripSelect?.(trip)  // notifica o pai
                     }}
                   >
                     <div className="trip-card-header">
