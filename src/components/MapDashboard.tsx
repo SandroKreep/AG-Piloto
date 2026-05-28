@@ -99,7 +99,7 @@ export default function MapDashboard() {
     async function loadInitial() {
       const { data: tripRows } = await supabase
         .from('trips')
-        .select('id,status,quoted_price,final_price,service_id,driver_id,passenger_id,requested_at,metadata')
+        .select('id,status,quoted_price,final_price,service_id,driver_id,passenger_id,requested_at,metadata,origin_lat,origin_lng,destination_lat,destination_lng,origin_address,destination_address')
         .order('requested_at', { ascending: false })
         .limit(80)
 
@@ -119,6 +119,10 @@ export default function MapDashboard() {
             driverName: row.driver_id ? `Driver ${String(row.driver_id).slice(0, 6)}` : 'Aguardando',
             customerName: row.passenger_id ? `Cliente ${String(row.passenger_id).slice(0, 6)}` : 'Cliente',
             valueCents: Math.round(Number(row.final_price ?? row.quoted_price ?? 0) * 100),
+            origin_lat: row.origin_lat ? Number(row.origin_lat) : undefined,
+            origin_lng: row.origin_lng ? Number(row.origin_lng) : undefined,
+            destination_lat: row.destination_lat ? Number(row.destination_lat) : undefined,
+            destination_lng: row.destination_lng ? Number(row.destination_lng) : undefined,
           }
         }),
       )

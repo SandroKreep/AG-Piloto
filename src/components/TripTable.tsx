@@ -7,6 +7,10 @@ export type TripRow = {
   driverName: string
   customerName: string
   valueCents: number
+  origin_lat?: number
+  origin_lng?: number
+  destination_lat?: number
+  destination_lng?: number
 }
 
 type Props = {

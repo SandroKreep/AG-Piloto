@@ -312,3 +312,91 @@
   margin: 12px 0 0;
   font-size: 0.85rem;
 }
+
+@media (max-width: 768px) {
+  .map-dashboard {
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 12px;
+  }
+
+  .map-dashboard__layout {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .map-dashboard__main {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .map-dashboard__tabs {
+    gap: 4px;
+  }
+
+  .map-dashboard__tabs button {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    border-radius: 8px;
+  }
+
+  .control-tower {
+    width: 100%;
+  }
+
+  .control-tower__map {
+    height: 200px;
+  }
+
+  .trip-table {
+    padding: 10px;
+  }
+
+  .trip-table__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .trip-table__filters {
+    width: 100%;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .trip-table__filters select {
+    width: 100%;
+    font-size: 0.82rem;
+  }
+
+  .trip-table__wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .trip-table table {
+    min-width: 480px;
+    font-size: 0.75rem;
+  }
+
+  .trip-table th,
+  .trip-table td {
+    padding: 6px 5px;
+  }
+
+  .trip-table__actions {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .trip-table__actions button {
+    font-size: 0.72rem;
+    padding: 5px 8px;
+  }
+
+  .trip-table__pagination {
+    font-size: 0.75rem;
+    gap: 6px;
+  }
+}
