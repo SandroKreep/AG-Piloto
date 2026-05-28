@@ -14,6 +14,8 @@ const SOCKET_URL = 'http://localhost:3000'
 const TripTable = lazy(() => import('./TripTable'))
 const SchoolSchedulesTab = lazy(() => import('./SchoolSchedulesTab'))
 
+const TRIPS_PAGE_SIZE = 8
+
 export default function MapDashboard() {
   const [vehicles, setVehicles] = useState<VehicleLive[]>([])
   const [trips, setTrips] = useState<TripRow[]>([])
@@ -23,6 +25,8 @@ export default function MapDashboard() {
   const [message, setMessage] = useState<string | null>(null)
   const [selectedFreteId, setSelectedFreteId] = useState<string | undefined>(undefined)
   const [selectedTripExternal, setSelectedTripExternal] = useState<any>(null)
+  const [tripsPage, setTripsPage] = useState(1)
+  const [tripsTotal, setTripsTotal] = useState(0)
   const { token, loading } = useAuthSession()
   const fallbackAdminId = useMemo(() => localStorage.getItem('ag_admin_id') ?? 'admin-demo-id', [])
 
@@ -97,40 +101,31 @@ export default function MapDashboard() {
 
   useEffect(() => {
     async function loadInitial() {
-      const { data: tripRows } = await supabase
-        .from('trips')
-        .select('id,status,quoted_price,final_price,service_id,driver_id,passenger_id,requested_at,metadata,origin_lat,origin_lng,destination_lat,destination_lng,origin_address,destination_address')
-        .order('requested_at', { ascending: false })
-        .limit(80)
+      console.time('total loadInitial')
+      console.time('services')
+      console.time('schedules')
+      console.time('fretes')
 
-      const { data: services } = await supabase.from('services').select('id,code')
-      const serviceMap = new Map((services ?? []).map((item) => [item.id as string, item.code as TripRow['serviceType']]))
+      const [
+        { data: services },
+        { data: schedulesRows },
+        { data: fretesRows },
+      ] = await Promise.all([
+        supabase.from('services').select('id,code'),
+        supabase
+          .from('family_schedules')
+          .select('id,pickup_address,destination_address,pickup_time,created_at,is_active')
+          .limit(60),
+        supabase
+          .from('fretes')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50),
+      ])
 
-      setTrips(
-        (tripRows ?? []).map((row) => {
-          // Check if service_type is in metadata (for farmacia, documentos, etc.)
-          const serviceTypeFromMetadata = (row.metadata as any)?.service_type as string
-          const serviceType = (serviceTypeFromMetadata as TripRow['serviceType']) || (serviceMap.get(String(row.service_id)) ?? 'taxi')
-
-          return {
-            id: String(row.id),
-            status: String(row.status ?? 'REQUESTED').toUpperCase(),
-            serviceType: serviceType as TripRow['serviceType'],
-            driverName: row.driver_id ? `Driver ${String(row.driver_id).slice(0, 6)}` : 'Aguardando',
-            customerName: row.passenger_id ? `Cliente ${String(row.passenger_id).slice(0, 6)}` : 'Cliente',
-            valueCents: Math.round(Number(row.final_price ?? row.quoted_price ?? 0) * 100),
-            origin_lat: row.origin_lat ? Number(row.origin_lat) : undefined,
-            origin_lng: row.origin_lng ? Number(row.origin_lng) : undefined,
-            destination_lat: row.destination_lat ? Number(row.destination_lat) : undefined,
-            destination_lng: row.destination_lng ? Number(row.destination_lng) : undefined,
-          }
-        }),
-      )
-
-      const { data: schedulesRows } = await supabase
-        .from('family_schedules')
-        .select('id,pickup_address,destination_address,pickup_time,created_at,is_active')
-        .limit(60)
+      console.timeEnd('services')
+      console.timeEnd('schedules')
+      console.timeEnd('fretes')
 
       setSchedules(
         (schedulesRows ?? []).map((row) => ({
@@ -143,16 +138,71 @@ export default function MapDashboard() {
         })),
       )
 
-      const { data: fretesRows } = await supabase
-        .from('fretes')
-        .select('*')
-        .order('created_at', { ascending: false })
-
       setFretes(fretesRows ?? [])
+
+      console.timeEnd('total loadInitial')
     }
 
     void loadInitial()
   }, [])
+
+  const loadTrips = useCallback(async () => {
+    console.time('trips')
+    const from = (tripsPage - 1) * TRIPS_PAGE_SIZE
+    const to = from + TRIPS_PAGE_SIZE - 1
+
+    const { data: tripRows, count } = await supabase
+      .from('trips')
+      .select('id,status,quoted_price,final_price,service_id,driver_id,passenger_id,requested_at,metadata,origin_lat,origin_lng,destination_lat,destination_lng,origin_address,destination_address', { count: 'exact' })
+      .order('requested_at', { ascending: false })
+      .range(from, to)
+
+    console.timeEnd('trips')
+
+    const { data: services } = await supabase.from('services').select('id,code')
+    const serviceMap = new Map((services ?? []).map((item) => [item.id as string, item.code as TripRow['serviceType']]))
+
+    setTrips(
+      (tripRows ?? []).map((row) => {
+        const serviceTypeFromMetadata = (row.metadata as any)?.service_type as string
+        const serviceType = (serviceTypeFromMetadata as TripRow['serviceType']) || (serviceMap.get(String(row.service_id)) ?? 'taxi')
+
+        return {
+          id: String(row.id),
+          status: String(row.status ?? 'REQUESTED').toUpperCase(),
+          serviceType: serviceType as TripRow['serviceType'],
+          driverName: row.driver_id ? `Driver ${String(row.driver_id).slice(0, 6)}` : 'Aguardando',
+          customerName: row.passenger_id ? `Cliente ${String(row.passenger_id).slice(0, 6)}` : 'Cliente',
+          valueCents: Math.round(Number(row.final_price ?? row.quoted_price ?? 0) * 100),
+          origin_lat: row.origin_lat ? Number(row.origin_lat) : undefined,
+          origin_lng: row.origin_lng ? Number(row.origin_lng) : undefined,
+          destination_lat: row.destination_lat ? Number(row.destination_lat) : undefined,
+          destination_lng: row.destination_lng ? Number(row.destination_lng) : undefined,
+        }
+      }),
+    )
+
+    setTripsTotal(count ?? 0)
+  }, [tripsPage])
+
+  useEffect(() => {
+    void loadTrips()
+  }, [loadTrips])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('trips-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'trips' },
+        () => {
+          void loadTrips()
+        }
+      )
+      .subscribe()
+
+    return () => { void supabase.removeChannel(channel) }
+  }, [loadTrips])
 
   const financial = useMemo(() => {
     const todayKey = new Date().toDateString()
@@ -248,6 +298,10 @@ export default function MapDashboard() {
                 trips={trips}
                 onForceCancel={async (tripId) => runAction(tripId, 'cancel')}
                 onReassign={async (tripId) => runAction(tripId, 'reassign')}
+                page={tripsPage}
+                setPage={setTripsPage}
+                total={tripsTotal}
+                pageSize={TRIPS_PAGE_SIZE}
               />
             ) : (
               <FretesTab fretes={fretes} />

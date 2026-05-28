@@ -17,9 +17,11 @@ type Props = {
   trips: TripRow[]
   onForceCancel: (tripId: string) => Promise<void>
   onReassign: (tripId: string) => Promise<void>
+  page: number
+  setPage: (page: number) => void
+  total: number
+  pageSize: number
 }
-
-const PAGE_SIZE = 8
 
 function getServiceIcon(serviceType: TripRow['serviceType']): JSX.Element {
   switch (serviceType) {
@@ -69,10 +71,9 @@ function getServiceIcon(serviceType: TripRow['serviceType']): JSX.Element {
   }
 }
 
-function TripTable({ trips, onForceCancel, onReassign }: Props) {
+function TripTable({ trips, onForceCancel, onReassign, page, setPage, total, pageSize }: Props) {
   const [statusFilter, setStatusFilter] = useState<'all' | string>('all')
   const [serviceFilter, setServiceFilter] = useState<'all' | TripRow['serviceType']>('all')
-  const [page, setPage] = useState(1)
 
   const filtered = useMemo(() => {
     return trips.filter((trip) => {
@@ -82,11 +83,7 @@ function TripTable({ trips, onForceCancel, onReassign }: Props) {
     })
   }, [serviceFilter, statusFilter, trips])
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const paged = useMemo(
-    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
-    [filtered, page],
-  )
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
   return (
     <section className="trip-table">
@@ -125,7 +122,7 @@ function TripTable({ trips, onForceCancel, onReassign }: Props) {
             </tr>
           </thead>
           <tbody>
-            {paged.map((trip) => (
+            {filtered.map((trip) => (
               <tr key={trip.id}>
                 <td>{trip.id.slice(0, 8)}</td>
                 <td>{trip.status}</td>
@@ -144,11 +141,11 @@ function TripTable({ trips, onForceCancel, onReassign }: Props) {
       </div>
 
       <div className="trip-table__pagination">
-        <button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>
+        <button type="button" disabled={page <= 1} onClick={() => setPage(page - 1)}>
           Anterior
         </button>
         <span>Página {page} de {totalPages}</span>
-        <button type="button" disabled={page >= totalPages} onClick={() => setPage((value) => value + 1)}>
+        <button type="button" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
           Próxima
         </button>
       </div>
