@@ -15,9 +15,11 @@ type FreteRow = {
 
 type Props = {
   fretes: any[]
+  onSelectFrete?: (frete: any) => void
+  selectedFreteId?: string
 }
 
-export default function FretesTab({ fretes }: Props) {
+export default function FretesTab({ fretes, onSelectFrete, selectedFreteId }: Props) {
   const handleAccept = async (id: string) => {
     const { error } = await supabase
       .from('fretes')
@@ -59,7 +61,12 @@ export default function FretesTab({ fretes }: Props) {
       ) : (
         <div className="fretes-tab__list">
           {fretes.map((frete) => (
-            <div key={frete.id} className="fretes-tab__card">
+            <div 
+              key={frete.id} 
+              className="fretes-tab__card"
+              style={{ border: selectedFreteId === frete.id ? '2px solid #ff6b00' : '' }}
+              onClick={() => onSelectFrete?.(frete)}
+            >
               <div className="fretes-tab__card-header">
                 <span className="fretes-tab__date">{formatDate(frete.created_at)}</span>
                 {getStatusBadge(frete.status)}

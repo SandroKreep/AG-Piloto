@@ -31,7 +31,7 @@ export type Trip = {
   origin_lng?: number
   destination_lat?: number
   destination_lng?: number
-  status: 'pending' | 'accepted' | 'completed' | 'cancelled'
+  status: 'pending' | 'accepted' | 'completed' | 'cancelled' | 'ASSIGNED'
   client_name: string
   client_phone: string
   service_type: 'moto' | 'carro' | 'caminhao'
@@ -57,6 +57,10 @@ export type VehicleLive = {
 
 type Props = {
   vehicles: VehicleLive[]
+  onSelectFrete?: (frete: any) => void
+  selectedFreteId?: string
+  selectedTrip?: Trip | null
+  onAcceptTrip?: (tripId: string) => Promise<void>
 }
 
 function buildVehicleIcon(type: VehicleType) {
@@ -151,9 +155,10 @@ function ServiceIcon({ serviceType }: { serviceType: Trip['service_type'] }) {
   }
 }
 
-function ControlTower({ vehicles }: Props) {
+function ControlTower({ vehicles, onSelectFrete, selectedFreteId, selectedTrip: externalSelectedTrip, onAcceptTrip }: Props) {
   const [trips, setTrips] = useState<Trip[]>([])
-  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null) // New state for selected trip
+  const [internalSelectedTrip, setInternalSelectedTrip] = useState<Trip | null>(null) // New state for selected trip
+  const selectedTrip = externalSelectedTrip ?? internalSelectedTrip
   const sound = useRef<Howl | null>(null)
   const [route, setRoute] = useState<Array<[number, number]>>([])
   const [routeLoading, setRouteLoading] = useState<boolean>(false)
@@ -295,7 +300,7 @@ function ControlTower({ vehicles }: Props) {
       // The `UPDATE` event listener will handle state update automatically
       console.log(`✅ ADMIN SUCCESS: Trip ${tripId} accepted with status ASSIGNED.`)
       if (selectedTrip?.id === tripId) {
-        setSelectedTrip(null) // Clear selected trip if accepted trip was selected
+        setInternalSelectedTrip(null) // Clear selected trip if accepted trip was selected
       }
     }
   }
@@ -412,7 +417,7 @@ function ControlTower({ vehicles }: Props) {
             }
           })
           if (selectedTrip?.id === updatedTrip.id && (updatedTrip.status === 'completed' || updatedTrip.status === 'cancelled')) {
-            setSelectedTrip(null) // Clear selected trip if it was completed/cancelled
+            setInternalSelectedTrip(null) // Clear selected trip if it was completed/cancelled
           }
         },
       )
@@ -595,7 +600,7 @@ function ControlTower({ vehicles }: Props) {
                     onClick={(e) => {
                       e.preventDefault() // Previne o comportamento padrão do clique (se houver)
                       e.stopPropagation() // Impede a propagação do evento
-                      setSelectedTrip(trip)
+                      setInternalSelectedTrip(trip)
                     }}
                   >
                     <div className="trip-card-header">
@@ -626,7 +631,7 @@ function ControlTower({ vehicles }: Props) {
             </div>
           </>
         ) : (
-          <FretesTab fretes={fretes} />
+          <FretesTab fretes={fretes} onSelectFrete={onSelectFrete} selectedFreteId={selectedFreteId} />
         )}
       </div>
       <div className="control-tower__main-content">

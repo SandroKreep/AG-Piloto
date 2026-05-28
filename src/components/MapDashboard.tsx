@@ -21,6 +21,8 @@ export default function MapDashboard() {
   const [fretes, setFretes] = useState<any[]>([])
   const [activeTab, setActiveTab] = useState<'operacoes' | 'fretes'>('operacoes')
   const [message, setMessage] = useState<string | null>(null)
+  const [selectedFreteId, setSelectedFreteId] = useState<string | undefined>(undefined)
+  const [selectedTrip, setSelectedTrip] = useState<any>(null)
   const { token, loading } = useAuthSession()
   const fallbackAdminId = useMemo(() => localStorage.getItem('ag_admin_id') ?? 'admin-demo-id', [])
 
@@ -161,6 +163,38 @@ export default function MapDashboard() {
     return { completedToday, totalCommissionCents, payoutAvailableCents }
   }, [trips])
 
+  const handleSelectFrete = useCallback((frete: any) => {
+    setSelectedFreteId(frete.id)
+    setSelectedTrip({
+      id: frete.id,
+      status: frete.status,
+      service_type: 'frete',
+      driver_name: 'Aguardando',
+      client_name: frete.whatsapp || 'Cliente',
+      client_phone: frete.whatsapp || '',
+      quoted_price: frete.quoted_price,
+      origin_address: frete.origem_address,
+      destination_address: frete.destino_address,
+      origin_lat: frete.origem_lat,
+      origin_lng: frete.origem_lng,
+      destination_lat: frete.destino_lat,
+      destination_lng: frete.destino_lng,
+      created_at: frete.created_at,
+    })
+  }, [])
+
+  const handleAcceptTrip = useCallback(async (tripId: string) => {
+    // Actualiza estado local imediatamente
+    setTrips(prev => prev.map(t =>
+      t.id === tripId ? { ...t, status: 'ASSIGNED' } : t
+    ))
+    // Fallback ao Supabase
+    await supabase
+      .from('trips')
+      .update({ status: 'ASSIGNED' })
+      .eq('id', tripId)
+  }, [])
+
   const runAction = useCallback(async (tripId: string, type: 'cancel' | 'reassign') => {
     if (!token) {
       setMessage('Sessão inválida. Faça login para intervir nas corridas.')
@@ -195,7 +229,7 @@ export default function MapDashboard() {
 
       <div className="map-dashboard__layout">
         <div className="map-dashboard__main">
-          <ControlTower vehicles={vehicles} />
+          <ControlTower vehicles={vehicles} onSelectFrete={handleSelectFrete} selectedFreteId={selectedFreteId} selectedTrip={selectedTrip} onAcceptTrip={handleAcceptTrip} />
           <div className="map-dashboard__tabs">
             <button type="button" className={activeTab === 'operacoes' ? 'is-active' : ''} onClick={() => setActiveTab('operacoes')}>
               Pedidos
