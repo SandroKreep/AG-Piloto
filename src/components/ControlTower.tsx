@@ -324,25 +324,13 @@ function ControlTower({ vehicles, onSelectFrete, selectedFreteId, selectedTrip: 
         .from('trips')
         .select('*')
         .order('created_at', { ascending: false })
+        .limit(20)
 
       if (error) {
         console.error('Error fetching trips:', error)
       } else if (data) {
-        // Geocode addresses for initial trips if needed (similar to realtime insert)
-        const tripsWithGeocoded = await Promise.all(data.map(async (trip) => {
-          if (trip.origin_address) { // Always try to geocode if address exists
-            const coords = await geocodeAddress(trip.origin_address)
-            if (coords && !coords.isFallback) {
-              return { ...trip, geocoded_lat: coords.lat, geocoded_lng: coords.lng }
-            } else if (coords && coords.isFallback) {
-              // If it's a fallback, we mark it to be filtered out later if the original address was truly outside
-              return { ...trip, geocoded_lat: coords.lat, geocoded_lng: coords.lng, _isOutsideLuanda: true }
-            }
-          }
-          return trip
-        }))
-        // Filter out trips that were marked as being outside Luanda (after geocoding fallback)
-        setTrips(tripsWithGeocoded.filter(trip => !trip._isOutsideLuanda) as Trip[])
+        // Use existing coordinates from database for initial trips
+        setTrips(data as Trip[])
       }
       setIsLoadingTrips(false)
     }
