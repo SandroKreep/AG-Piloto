@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import './Comida.css'
 
@@ -9,6 +9,9 @@ export default function Comida() {
   const [gpsLoading, setGpsLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [sugestoes, setSugestoes] = useState<any[]>([])
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false)
+  const debounceRef = useRef<any>(null)
 
   useEffect(() => {
     supabase
@@ -26,10 +29,10 @@ export default function Comida() {
         const { latitude, longitude } = pos.coords
         try {
           const res = await fetch(
-            `/api/geocode?q=${latitude},${longitude}&reverse=true` 
+            `/api/reverse-geocode?lat=${latitude}&lon=${longitude}`
           )
           const data = await res.json()
-          if (data && data[0]) setEndereco(data[0].display_name)
+          if (data?.display_name) setEndereco(data.display_name)
           else setEndereco(`${latitude}, ${longitude}`)
         } catch {
           setEndereco(`${latitude}, ${longitude}`)
@@ -39,6 +42,28 @@ export default function Comida() {
       () => setGpsLoading(false),
       { enableHighAccuracy: false, timeout: 8000 }
     )
+  }
+
+  const buscarSugestoes = (texto: string) => {
+    setEndereco(texto)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (texto.length < 3) {
+      setSugestoes([])
+      setMostrarSugestoes(false)
+      return
+    }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/geocode?q=${encodeURIComponent(texto + ' Luanda Angola')}`
+        )
+        const data = await res.json()
+        setSugestoes(data)
+        setMostrarSugestoes(true)
+      } catch {
+        setSugestoes([])
+      }
+    }, 600)
   }
 
   const confirmarPedido = async () => {
@@ -124,9 +149,44 @@ export default function Comida() {
               <input
                 className="comida-modal__input"
                 value={endereco}
-                onChange={(e) => setEndereco(e.target.value)}
+                onChange={(e) => buscarSugestoes(e.target.value)}
                 placeholder={gpsLoading ? 'A obter localização...' : 'Ex: Rua da Samba, Luanda'}
               />
+              {mostrarSugestoes && sugestoes.length > 0 && (
+                <div style={{
+                  background: '#fff',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '10px',
+                  maxHeight: '180px',
+                  overflowY: 'auto',
+                  marginTop: '4px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  position: 'relative',
+                  zIndex: 10
+                }}>
+                  {sugestoes.map((s: any) => (
+                    <div
+                      key={s.place_id}
+                      onClick={() => {
+                        setEndereco(s.display_name)
+                        setSugestoes([])
+                        setMostrarSugestoes(false)
+                      }}
+                      style={{
+                        padding: '10px 12px',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        borderBottom: '1px solid #f0f0f0',
+                        color: '#111827'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = '#fff')}
+                    >
+                      {s.display_name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <button
               className="comida-modal__confirm"
