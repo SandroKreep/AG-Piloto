@@ -195,7 +195,8 @@ export default function MapDashboard() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'trips' },
-        () => {
+        (payload) => {
+          console.log('Realtime event:', payload)
           void loadTrips()
         }
       )
