@@ -16,6 +16,8 @@ import AdminFarmacia from './pages/AdminFarmacia'
 import Farmacia from './pages/Farmacia'
 import Frete from './pages/Frete'
 import Documentos from './pages/Documentos'
+import Comida from './pages/Comida'
+import AdminComida from './pages/AdminComida'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuthStore } from './store/authStore'
 
@@ -75,6 +77,14 @@ export default function App() {
       <Route
         path="/documentos"
         element={<Documentos />}
+      />
+      <Route
+        path="/comida"
+        element={<Comida />}
+      />
+      <Route
+        path="/admin/comida"
+        element={<AdminComida />}
       />
       <Route
         path="/trips/:tripId"

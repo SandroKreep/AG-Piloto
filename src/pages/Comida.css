@@ -1,0 +1,220 @@
+.comida-page {
+  padding: 0;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #f4f6fb;
+  min-height: 100vh;
+}
+
+.comida-header {
+  background: linear-gradient(135deg, #ff6b00, #ff4500);
+  padding: 32px 20px;
+  border-radius: 0 0 24px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.comida-header__title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 4px;
+}
+
+.comida-header__subtitle {
+  color: #fff;
+  opacity: 0.85;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.comida-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 0 16px 20px;
+}
+
+@media (min-width: 768px) {
+  .comida-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.comida-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 260px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.comida-card:hover {
+  transform: scale(1.02);
+}
+
+.comida-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  object-position: center;
+}
+
+.comida-card__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent 30%, rgba(0,0,0,0.92));
+  padding: 16px;
+}
+
+.comida-card__nome {
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin: 0 0 2px;
+}
+
+.comida-card__preco {
+  color: #4ade80;
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+
+.comida-card__btn {
+  width: 100%;
+  background: linear-gradient(135deg, #ff6b00, #ff4500);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255,107,0,0.4);
+  transition: opacity 0.2s;
+}
+
+.comida-card__btn:hover {
+  opacity: 0.9;
+}
+
+.comida-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.comida-modal {
+  background: #fff;
+  border-radius: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.comida-modal__title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.comida-modal__preco {
+  color: #16a34a;
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0 0 8px;
+}
+
+.comida-modal__desc {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin: 0 0 16px;
+}
+
+.comida-modal__label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.comida-modal__input-row {
+  margin-bottom: 16px;
+}
+
+.comida-modal__input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: #111827;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.comida-modal__input:focus {
+  border-color: #ff6b00;
+  box-shadow: 0 0 0 3px rgba(255,107,0,0.12);
+}
+
+.comida-modal__confirm {
+  width: 100%;
+  background: linear-gradient(135deg, #ff6b00, #ff4500);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: opacity 0.2s;
+}
+
+.comida-modal__confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.comida-modal__success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.comida-modal__close {
+  width: 100%;
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 0.88rem;
+  cursor: pointer;
+}

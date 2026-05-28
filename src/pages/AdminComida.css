@@ -1,0 +1,137 @@
+.admin-comida {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.admin-comida h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.admin-comida__form {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-comida__form h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.admin-comida__form input,
+.admin-comida__form textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.admin-comida__form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.admin-comida__form button {
+  background: linear-gradient(135deg, #ff6b00, #ff4500);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.admin-comida__msg {
+  color: #16a34a;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.admin-comida__lista h2 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+.admin-comida__item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.admin-comida__img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.admin-comida__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.admin-comida__info strong {
+  color: #111827;
+  font-size: 0.95rem;
+}
+
+.admin-comida__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.btn-green {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-gray {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-red {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
