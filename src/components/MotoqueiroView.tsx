@@ -38,6 +38,26 @@ export default function MotoqueiroView() {
               </span>
             </span>
           </Link>
+
+          <Link to="/motoqueiro/pedidos" className="driver__cta" style={{ marginTop: '12px', background: 'linear-gradient(135deg, #16a34a, #22c55e)' }}>
+            <span className="driver__cta-inner">
+              <span className="driver__cta-text">
+                <span className="driver__cta-main">Ver Pedidos Disponíveis</span>
+                <span className="driver__cta-sub">Para motoristas já registados</span>
+              </span>
+              <span className="driver__cta-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M5 12h14m0 0l-6-6m6 6l-6 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </span>
+          </Link>
         </div>
 
         <section className="driver__legal">

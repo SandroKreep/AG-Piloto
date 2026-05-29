@@ -20,6 +20,7 @@ import Comida from './pages/Comida'
 import AdminComida from './pages/AdminComida'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuthStore } from './store/authStore'
+import MotoqueiroPedidos from './pages/MotoqueiroPedidos'
 
 const MotoqueiroView = lazy(() => import('./components/MotoqueiroView'))
 
@@ -97,6 +98,10 @@ export default function App() {
       <Route
         path="/motoqueiro/candidatura"
         element={<CandidaturaPage />}
+      />
+      <Route
+        path="/motoqueiro/pedidos"
+        element={<MotoqueiroPedidos />}
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

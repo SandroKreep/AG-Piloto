@@ -458,18 +458,17 @@ export default function TripRequestForm({
           console.log('DEBUG: New status:', payload.new.status)
           console.log('DEBUG: Expected: ASSIGNED, Got:', payload.new.status)
           
-          if (payload.new.status === 'ASSIGNED') {
+          if (payload.new.status === 'ASSIGNED' || payload.new.status === 'assigned') {
             console.log('SUCCESS: Trip accepted!')
             setTripAccepted(true)
-            setAcceptedDriver(payload.new.driverId || 'Motorista')
+            setAcceptedDriver(payload.new.motorista_nome || 'Motorista')
             setWaitingSeconds(0)
             console.log('Trip accepted!', payload.new)
             
             // Send notification
             sendNotification('Pedido Aceito!', {
               body: 'Seu motorista está a caminho',
-              icon: '✓',
-              badge: '🚗',
+              icon: '/favicon.ico'
             })
 
             // Start waiting timer
@@ -477,25 +476,6 @@ export default function TripRequestForm({
             waitingTimerRef.current = setInterval(() => {
               setWaitingSeconds(prev => prev + 1)
             }, 1000)
-
-            // Listen for driver location updates if driverId exists
-            if (payload.new.driverId) {
-              driverSubscriptionRef.current = supabase
-                .channel(`driver-location-${payload.new.driverId}`)
-                .on(
-                  'postgres_changes',
-                  { event: 'UPDATE', schema: 'public', table: 'drivers', filter: `id=eq.${payload.new.driverId}` },
-                  (driverPayload: any) => {
-                    if (driverPayload.new.current_lat && driverPayload.new.current_lng) {
-                      setDriverLocation({
-                        lat: driverPayload.new.current_lat,
-                        lng: driverPayload.new.current_lng,
-                      })
-                    }
-                  }
-                )
-                .subscribe()
-            }
           }
         }
       )

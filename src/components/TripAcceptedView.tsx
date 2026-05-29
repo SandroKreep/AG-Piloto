@@ -13,6 +13,14 @@ interface TripAcceptedViewProps {
   onNewTrip: () => void
 }
 
+function sendNotification(title: string, options?: NotificationOptions) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, options)
+  } else if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission()
+  }
+}
+
 export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', onNewTrip }: TripAcceptedViewProps) {
   const [activeTab, setActiveTab] = useState<'info' | 'chat' | 'rating' | 'payment'>('info')
   const [tripDetails, setTripDetails] = useState<any>(null)
@@ -24,7 +32,7 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
       setLoading(true)
       const { data } = await supabase
         .from('trips')
-        .select('quoted_price, origin_lat, origin_lng, destination_lat, destination_lng, origin_address, destination_address')
+        .select('quoted_price, origin_lat, origin_lng, destination_lat, destination_lng, origin_address, destination_address, status, motorista_nome')
         .eq('id', tripId)
         .single()
       if (data) {
@@ -50,6 +58,43 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
     }
     fetchTrip()
   }, [tripId])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`trip-status-${tripId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'trips',
+          filter: `id=eq.${tripId}`
+        },
+        (payload) => {
+          console.log('Trip status update:', payload)
+          
+          if (payload.new.status === 'CANCELLED') {
+            sendNotification('Viagem Cancelada', {
+              body: 'O motoqueiro cancelou a viagem',
+              icon: '/favicon.ico'
+            })
+            alert('O motoqueiro cancelou a viagem')
+            onNewTrip()
+          } else if (payload.new.status === 'ASSIGNED' && !tripDetails?.motorista_nome) {
+            sendNotification('Motoqueiro Aceitou!', {
+              body: 'Seu motorista está a caminho',
+              icon: '/favicon.ico'
+            })
+            setTripDetails(prev => ({ ...prev, motorista_nome: payload.new.motorista_nome }))
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [tripId, tripDetails, onNewTrip])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-AO', {

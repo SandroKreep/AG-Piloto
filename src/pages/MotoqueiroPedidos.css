@@ -1,0 +1,218 @@
+.moto-pedidos { 
+  max-width: 600px; 
+  margin: 0 auto; 
+  padding: 16px; 
+  min-height: 100vh;
+  background: #f4f6fb;
+}
+
+.moto-login {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 24px;
+  margin-top: 40px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.moto-login h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.moto-login p {
+  color: #6b7280;
+  font-size: 0.88rem;
+  margin-bottom: 24px;
+}
+
+.moto-login input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.moto-login input:focus {
+  border-color: #ff6b00;
+  box-shadow: 0 0 0 3px rgba(255,107,0,0.12);
+}
+
+.moto-login button {
+  width: 100%;
+  background: linear-gradient(135deg, #ff6b00, #ff4500);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255,107,0,0.35);
+}
+
+.moto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.moto-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.moto-header button {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.moto-filtros {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.moto-filtro {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.moto-filtro.ativo {
+  background: linear-gradient(135deg, #ff6b00, #ff4500);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(255,107,0,0.3);
+}
+
+.moto-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: 1px solid #f3f4f6;
+  animation: slideIn 0.3s ease;
+}
+
+.moto-card--aceite {
+  border-left: 4px solid #16a34a;
+  background: #f0fdf4;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.moto-card__tipo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #ff6b00;
+  margin-bottom: 10px;
+}
+
+.moto-card__rota {
+  font-size: 0.82rem;
+  color: #374151;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 6px;
+}
+
+.moto-card__rota strong {
+  color: #111827;
+  min-width: 32px;
+}
+
+.moto-card__preco {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #16a34a;
+  margin: 10px 0;
+}
+
+.moto-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.moto-card__data {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.moto-card__aceitar {
+  background: linear-gradient(135deg, #ff6b00, #ff4500);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255,107,0,0.35);
+  transition: transform 0.15s;
+}
+
+.moto-card__aceitar:hover {
+  transform: translateY(-1px);
+}
+
+.moto-badge-aceite {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.moto-secao-titulo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 20px 0 12px;
+}
+
+.moto-vazio {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.88rem;
+  padding: 32px 0;
+}
