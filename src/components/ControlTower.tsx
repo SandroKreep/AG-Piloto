@@ -358,28 +358,10 @@ function ControlTower({ vehicles, onSelectFrete, selectedFreteId, selectedTrip: 
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'trips' },
-        async (payload) => {
-          let newTrip = payload.new as Trip
-          if (newTrip.origin_address) {
-            const coords = await geocodeAddress(newTrip.origin_address)
-            if (coords && !coords.isFallback) {
-              newTrip.geocoded_lat = coords.lat
-              newTrip.geocoded_lng = coords.lng
-            } else if (coords && coords.isFallback) {
-              newTrip = { ...newTrip, geocoded_lat: coords.lat, geocoded_lng: coords.lng, _isOutsideLuanda: true }
-            } else {
-              // If geocoding completely fails, still mark for filtering
-              newTrip = { ...newTrip, _isOutsideLuanda: true }
-            }
-          }
-          // Only add if not marked as outside Luanda
-          if (!newTrip._isOutsideLuanda) {
-            setTrips((prevTrips) => [{
-              ...newTrip,
-              new: true, // Mark as new for animation
-            }, ...prevTrips]);
-          }
-        },
+        (payload) => {
+          const newTrip = payload.new as Trip
+          setTrips((prev) => [{ ...newTrip, new: true }, ...prev])
+        }
       )
       .on(
         'postgres_changes',
