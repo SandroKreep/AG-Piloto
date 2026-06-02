@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { MessageSquare, Star, CreditCard, Clock, MapPin, X } from 'lucide-react'
+import { Clock, MapPin, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
-import ChatComponent from './ChatComponent'
-import RatingComponent from './RatingComponent'
-import PaymentComponent from './PaymentComponent'
 import './TripAcceptedView.css'
 
 interface TripAcceptedViewProps {
@@ -22,7 +19,7 @@ function sendNotification(title: string, options?: NotificationOptions) {
 }
 
 export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', onNewTrip }: TripAcceptedViewProps) {
-  const [activeTab, setActiveTab] = useState<'info' | 'chat' | 'rating' | 'payment'>('info')
+  const [activeTab, setActiveTab] = useState<'info'>('info')
   const [tripDetails, setTripDetails] = useState<any>(null)
   const [routeInfo, setRouteInfo] = useState<{ distanceKm: number; durationMin: number } | null>(null)
   const [loading, setLoading] = useState(true)
@@ -130,30 +127,6 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
         >
           <Clock size={16} />
           Informações
-        </button>
-        
-        <button
-          className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
-          onClick={() => setActiveTab('chat')}
-        >
-          <MessageSquare size={16} />
-          Chat
-        </button>
-        
-        <button
-          className={`tab-btn ${activeTab === 'rating' ? 'active' : ''}`}
-          onClick={() => setActiveTab('rating')}
-        >
-          <Star size={16} />
-          Avaliar
-        </button>
-        
-        <button
-          className={`tab-btn ${activeTab === 'payment' ? 'active' : ''}`}
-          onClick={() => setActiveTab('payment')}
-        >
-          <CreditCard size={16} />
-          Pagar
         </button>
       </div>
 
@@ -278,36 +251,6 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
           </div>
         )}
 
-        {activeTab === 'chat' && (
-          <div className="chat-content">
-            <ChatComponent
-              tripId={tripId}
-              currentUserId="current-user-id" // Isso será obtido dinamicamente
-              currentUserType="CUSTOMER"
-              recipientName={driverName}
-            />
-          </div>
-        )}
-
-        {activeTab === 'rating' && (
-          <div className="rating-content">
-            <RatingComponent
-              tripId={tripId}
-              customerId="current-user-id" // Isso será obtido dinamicamente
-              onRatingSubmitted={() => setActiveTab('info')}
-            />
-          </div>
-        )}
-
-        {activeTab === 'payment' && (
-          <div className="payment-content">
-            <PaymentComponent
-              tripId={tripId}
-              amountCents={5000} // Exemplo: 50.00 AOA
-              onPaymentComplete={() => setActiveTab('info')}
-            />
-          </div>
-        )}
       </div>
     </div>
   )
