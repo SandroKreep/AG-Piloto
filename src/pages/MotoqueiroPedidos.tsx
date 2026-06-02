@@ -195,24 +195,26 @@ export default function MotoqueiroPedidos() {
         motorista_id: motorista.id,
         motorista_nome: motorista.nome,
         motorista_whatsapp: motorista.whatsapp,
+        updated_at: new Date().toISOString()
       })
       .eq('id', tripId)
-      .eq('status', 'PENDING')
+      .in('status', ['PENDING', 'pending', 'REQUESTED', 'requested'])
 
-    console.error('Erro ao aceitar pedido:', error)
-
-    if (!error) {
-      const pedidoAceite = pedidos.find(p => p.id === tripId)
-      if (pedidoAceite) {
-        setMeusPedidos(prev => [{
-          ...pedidoAceite,
-          status: 'ASSIGNED',
-          motorista_nome: motorista.nome,
-          motorista_whatsapp: motorista.whatsapp,
-        }, ...prev])
-      }
-      setPedidos(prev => prev.filter(p => p.id !== tripId))
+    if (error) {
+      console.error('Erro ao aceitar pedido:', error)
+      return
     }
+
+    const pedidoAceite = pedidos.find(p => p.id === tripId)
+    if (pedidoAceite) {
+      setMeusPedidos(prev => [{
+        ...pedidoAceite,
+        status: 'ASSIGNED',
+        motorista_nome: motorista.nome,
+        motorista_whatsapp: motorista.whatsapp,
+      }, ...prev])
+    }
+    setPedidos(prev => prev.filter(p => p.id !== tripId))
   }
 
   const cancelarPedido = async (tripId: string) => {

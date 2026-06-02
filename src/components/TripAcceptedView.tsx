@@ -32,7 +32,7 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
       setLoading(true)
       const { data } = await supabase
         .from('trips')
-        .select('quoted_price, origin_lat, origin_lng, destination_lat, destination_lng, origin_address, destination_address, status, motorista_nome')
+        .select('quoted_price, origin_lat, origin_lng, destination_lat, destination_lng, origin_address, destination_address, status, motorista_nome, motorista_whatsapp')
         .eq('id', tripId)
         .single()
       if (data) {
@@ -80,12 +80,13 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
             })
             alert('O motoqueiro cancelou a viagem')
             onNewTrip()
-          } else if (payload.new.status === 'ASSIGNED' && !tripDetails?.motorista_nome) {
-            sendNotification('Motoqueiro Aceitou!', {
-              body: 'Seu motorista está a caminho',
-              icon: '/favicon.ico'
-            })
-            setTripDetails(prev => ({ ...prev, motorista_nome: payload.new.motorista_nome }))
+          } else if (payload.new.status === 'ASSIGNED') {
+            setTripDetails(prev => ({ 
+              ...prev, 
+              motorista_nome: payload.new.motorista_nome,
+              motorista_whatsapp: payload.new.motorista_whatsapp,
+              status: 'ASSIGNED'
+            }))
           }
         }
       )
@@ -227,6 +228,27 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
                   <span className="info-label">Status:</span>
                   <span className="info-value status-accepted">Aceito</span>
                 </div>
+                {tripDetails.motorista_whatsapp && (
+                  <div className="info-item">
+                    <span className="info-label">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
+                        viewBox="0 0 24 24" fill="none" stroke="#25D366" 
+                        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        style={{ display: 'inline', verticalAlign: 'middle', marginRight: '6px' }}>
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                      </svg>
+                      Motoqueiro:
+                    </span>
+                    <a
+                      href={`https://wa.me/${tripDetails.motorista_whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent('Olá! Estou a aguardar a minha viagem.')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#25D366', fontWeight: 700, textDecoration: 'none' }}
+                    >
+                      {tripDetails.motorista_nome || tripDetails.motorista_whatsapp}
+                    </a>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="info-card">
