@@ -8,7 +8,13 @@ import './MotoqueiroPedidos.css'
 type Motorista = {
   id: string
   nome: string
+  ultimo_nome?: string
+  email?: string
   whatsapp: string
+  foto_url?: string
+  password?: string
+  ativo?: boolean
+  created_at?: string
 }
 
 type Trip = {
@@ -32,8 +38,14 @@ export default function MotoqueiroPedidos() {
   const navigate = useNavigate()
   const [motorista, setMotorista] = useState<Motorista | null>(null)
   const [nome, setNome] = useState('')
+  const [ultimoNome, setUltimoNome] = useState('')
+  const [email, setEmail] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
+  const [password, setPassword] = useState('')
+  const [fotoFile, setFotoFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
+  const [modoLogin, setModoLogin] = useState<'login' | 'register'>('login')
+  const [erro, setErro] = useState('')
   const [pedidos, setPedidos] = useState<Trip[]>([])
   const [meusPedidos, setMeusPedidos] = useState<Trip[]>([])
   const [filtro, setFiltro] = useState<'Todos' | 'Moto-Táxi' | 'Frete' | 'Farmácia' | 'Documentos'>('Todos')
@@ -41,6 +53,7 @@ export default function MotoqueiroPedidos() {
   const [rota, setRota] = useState<[number, number][]>([])
   const [mapaLoading, setMapaLoading] = useState(false)
   const [motoristaLocation, setMotoristaLocation] = useState<[number, number] | null>(null)
+  const [aceitando, setAceitando] = useState<string | null>(null)
 
   useEffect(() => {
     const motoristaSalvo = localStorage.getItem('ag_motorista')
@@ -110,7 +123,7 @@ export default function MotoqueiroPedidos() {
           table: 'trips'
         },
         (payload) => {
-          if (payload.new.status === 'ASSIGNED') {
+          if (payload.new.status === 'ASSIGNED' || payload.new.status === 'assigned') {
             setPedidos(prev => prev.filter(p => p.id !== payload.new.id))
             if (payload.new.motorista_id === motorista.id) {
               setMeusPedidos(prev => [payload.new as Trip, ...prev])
@@ -123,24 +136,80 @@ export default function MotoqueiroPedidos() {
     return () => { supabase.removeChannel(channel) }
   }, [motorista])
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const registar = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setErro('')
+
+    if (password.length < 6) {
+      setErro('A senha deve ter no mínimo 6 caracteres.')
+      setLoading(false)
+      return
+    }
+
+    try {
+      // 1. Upload da foto
+      let foto_url = ''
+      if (fotoFile) {
+        const ext = fotoFile.name.split('.').pop()
+        const path = `${Date.now()}.${ext}`
+        const { error: uploadError } = await supabase.storage.from('motoristas').upload(path, fotoFile)
+        if (uploadError) throw uploadError
+        const { data } = supabase.storage.from('motoristas').getPublicUrl(path)
+        foto_url = data.publicUrl
+      }
+
+      // 2. Insere motorista
+      const { data, error } = await supabase
+        .from('motoristas')
+        .insert({ nome, ultimo_nome: ultimoNome, email, whatsapp, password, foto_url })
+        .select()
+        .single()
+
+      if (error) {
+        if (error.code === '23505') {
+          setErro('Email ou WhatsApp já registado.')
+        } else {
+          setErro('Erro ao criar conta: ' + error.message)
+        }
+        setLoading(false)
+        return
+      }
+
+      setMotorista(data)
+      localStorage.setItem('ag_motorista', JSON.stringify(data))
+    } catch (error: any) {
+      console.error('Erro ao registar:', error)
+      setErro('Erro ao criar conta: ' + error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const login = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setErro('')
 
     try {
       const { data, error } = await supabase
         .from('motoristas')
-        .upsert({ nome, whatsapp }, { onConflict: 'whatsapp' })
-        .select()
+        .select('*')
+        .or(`email.eq.${email},whatsapp.eq.${email}`)
+        .eq('password', password)
         .single()
 
-      if (error) throw error
+      if (error || !data) {
+        setErro('Email/WhatsApp ou senha incorrectos.')
+        setLoading(false)
+        return
+      }
 
       setMotorista(data)
       localStorage.setItem('ag_motorista', JSON.stringify(data))
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao fazer login:', error)
-      alert('Erro ao fazer login. Tente novamente.')
+      setErro('Erro ao fazer login: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -187,14 +256,17 @@ export default function MotoqueiroPedidos() {
 
   const aceitarPedido = async (tripId: string) => {
     if (!motorista) return
+    if (aceitando === tripId) return
+    setAceitando(tripId)
 
     const { error } = await supabase
       .from('trips')
       .update({
         status: 'ASSIGNED',
         motorista_id: motorista.id,
-        motorista_nome: motorista.nome,
+        motorista_nome: `${motorista.nome} ${motorista.ultimo_nome || ''}`.trim(),
         motorista_whatsapp: motorista.whatsapp,
+        motorista_foto_url: motorista.foto_url || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', tripId)
@@ -202,19 +274,27 @@ export default function MotoqueiroPedidos() {
 
     if (error) {
       console.error('Erro ao aceitar pedido:', error)
+      setPedidos(prev => prev.filter(p => p.id !== tripId))
+      setAceitando(null)
       return
     }
 
     const pedidoAceite = pedidos.find(p => p.id === tripId)
     if (pedidoAceite) {
-      setMeusPedidos(prev => [{
-        ...pedidoAceite,
-        status: 'ASSIGNED',
-        motorista_nome: motorista.nome,
-        motorista_whatsapp: motorista.whatsapp,
-      }, ...prev])
+      setMeusPedidos(prev => {
+        // Verifica se já existe antes de adicionar
+        if (prev.some(p => p.id === tripId)) return prev
+        return [{
+          ...pedidoAceite,
+          status: 'ASSIGNED',
+          motorista_nome: `${motorista.nome} ${motorista.ultimo_nome || ''}`.trim(),
+          motorista_whatsapp: motorista.whatsapp,
+          motorista_foto_url: motorista.foto_url || null,
+        }, ...prev]
+      })
     }
     setPedidos(prev => prev.filter(p => p.id !== tripId))
+    setAceitando(null)
   }
 
   const cancelarPedido = async (tripId: string) => {
@@ -363,26 +443,139 @@ export default function MotoqueiroPedidos() {
       <div className="moto-pedidos">
         <div className="moto-login">
           <h1>🏍️ Motoqueiro</h1>
-          <p>Entre com seus dados para ver pedidos disponíveis</p>
-          <form onSubmit={handleLogin}>
-            <input
-              type="text"
-              placeholder="Nome completo"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              required
-            />
-            <input
-              type="tel"
-              placeholder="WhatsApp (+244...)"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              required
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Entrando...' : 'Entrar'}
-            </button>
-          </form>
+          <p>{modoLogin === 'login' ? 'Entre com seus dados para ver pedidos disponíveis' : 'Crie sua conta para começar'}</p>
+          
+          {erro && (
+            <div style={{
+              background: '#fee2e2',
+              color: '#dc2626',
+              padding: '12px',
+              borderRadius: '8px',
+              marginBottom: '16px',
+              fontSize: '0.9rem'
+            }}>
+              {erro}
+            </div>
+          )}
+
+          {modoLogin === 'register' ? (
+            <form onSubmit={registar}>
+              <input
+                type="text"
+                placeholder="Primeiro nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Último nome"
+                value={ultimoNome}
+                onChange={(e) => setUltimoNome(e.target.value)}
+                required
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="tel"
+                placeholder="WhatsApp (+244...)"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Senha (mínimo 6 caracteres)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+              />
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '0.9rem',
+                  color: '#374151'
+                }}>
+                  Foto 4x4 (opcional):
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFotoFile(e.target.files?.[0] || null)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px'
+                  }}
+                />
+              </div>
+              <button type="submit" disabled={loading}>
+                {loading ? 'A criar conta...' : 'Criar Conta'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModoLogin('login')
+                  setErro('')
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#6b7280',
+                  marginTop: '12px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                Já tenho conta → Entrar
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={login}>
+              <input
+                type="text"
+                placeholder="Email ou WhatsApp"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button type="submit" disabled={loading}>
+                {loading ? 'Entrando...' : 'Entrar'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModoLogin('register')
+                  setErro('')
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#6b7280',
+                  marginTop: '12px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                Não tenho conta → Criar Conta
+              </button>
+            </form>
+          )}
         </div>
       </div>
     )
@@ -391,7 +584,28 @@ export default function MotoqueiroPedidos() {
   return (
     <div className="moto-pedidos">
       <div className="moto-header">
-        <h2>Olá, {motorista.nome}!</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {motorista.foto_url ? (
+            <img src={motorista.foto_url} 
+              style={{ width: 40, height: 40, borderRadius: '50%', 
+                objectFit: 'cover', border: '2px solid #ff6b00' }} 
+              alt={motorista.nome} />
+          ) : (
+            <div style={{ width: 40, height: 40, borderRadius: '50%',
+              background: '#ff6b00', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', color: '#fff', fontWeight: 700 }}>
+              {motorista.nome[0]}
+            </div>
+          )}
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>
+              {motorista.nome} {motorista.ultimo_nome}
+            </div>
+            <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+              {motorista.whatsapp}
+            </div>
+          </div>
+        </div>
         <button onClick={handleLogout}>Sair</button>
       </div>
 
@@ -558,6 +772,8 @@ export default function MotoqueiroPedidos() {
                   e.stopPropagation()
                   aceitarPedido(pedido.id)
                 }}
+                disabled={aceitando === pedido.id}
+                style={{ opacity: aceitando === pedido.id ? 0.6 : 1 }}
               >
                 Aceitar Pedido
               </button>
