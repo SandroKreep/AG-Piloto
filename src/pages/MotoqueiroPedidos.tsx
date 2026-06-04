@@ -128,7 +128,10 @@ export default function MotoqueiroPedidos() {
           if (payload.new.status === 'ASSIGNED' || payload.new.status === 'assigned') {
             setPedidos(prev => prev.filter(p => p.id !== payload.new.id))
             if (payload.new.motorista_id === motorista.id) {
-              setMeusPedidos(prev => [payload.new as Trip, ...prev])
+              setMeusPedidos(prev => {
+                if (prev.some(p => p.id === payload.new.id)) return prev
+                return [payload.new as Trip, ...prev]
+              })
             }
           }
         }
