@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { MapContainer, TileLayer, Marker, Polyline, ZoomControl } from 'react-leaflet'
 import L from 'leaflet'
@@ -32,10 +31,11 @@ type Trip = {
   origin_lng?: number
   destination_lat?: number
   destination_lng?: number
+  foto_url?: string
+  cliente_whatsapp?: string
 }
 
 export default function MotoqueiroPedidos() {
-  const navigate = useNavigate()
   const [motorista, setMotorista] = useState<Motorista | null>(null)
   const [nome, setNome] = useState('')
   const [ultimoNome, setUltimoNome] = useState('')
@@ -47,6 +47,7 @@ export default function MotoqueiroPedidos() {
   const [modoLogin, setModoLogin] = useState<'login' | 'register'>('login')
   const [erro, setErro] = useState('')
   const [pedidos, setPedidos] = useState<Trip[]>([])
+  const [fretes, setFretes] = useState<Trip[]>([])
   const [meusPedidos, setMeusPedidos] = useState<Trip[]>([])
   const [filtro, setFiltro] = useState<'Todos' | 'Moto-Táxi' | 'Frete' | 'Farmácia' | 'Documentos'>('Todos')
   const [pedidoSelecionado, setPedidoSelecionado] = useState<Trip | null>(null)
@@ -65,6 +66,7 @@ export default function MotoqueiroPedidos() {
   useEffect(() => {
     if (motorista) {
       carregarPedidos()
+      carregarFretes()
       carregarMeusPedidos()
     }
   }, [motorista])
@@ -127,6 +129,72 @@ export default function MotoqueiroPedidos() {
             setPedidos(prev => prev.filter(p => p.id !== payload.new.id))
             if (payload.new.motorista_id === motorista.id) {
               setMeusPedidos(prev => [payload.new as Trip, ...prev])
+            }
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'fretes'
+        },
+        (payload) => {
+          if (payload.new.status === 'pendente') {
+            const freteConvertido = {
+              id: payload.new.id,
+              status: payload.new.status,
+              service_type: 'frete',
+              origin_address: payload.new.origem_address || '',
+              destination_address: payload.new.destino_address || '',
+              quoted_price: payload.new.quoted_price,
+              created_at: payload.new.created_at,
+              motorista_id: null,
+              origin_lat: payload.new.origem_lat,
+              origin_lng: payload.new.origem_lng,
+              destination_lat: payload.new.destino_lat,
+              destination_lng: payload.new.destino_lng,
+              foto_url: payload.new.foto_url || null,
+              cliente_whatsapp: payload.new.whatsapp || null,
+              _is_frete: true,
+            }
+            setFretes(prev => [freteConvertido as Trip, ...prev])
+            const audio = new Audio('/notification.mp3')
+            audio.play().catch(() => {})
+            notificarBrowser(freteConvertido as Trip)
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'fretes'
+        },
+        (payload) => {
+          if (payload.new.status === 'aceite') {
+            setFretes(prev => prev.filter(f => f.id !== payload.new.id))
+            if (payload.new.motorista_id === motorista.id) {
+              const freteConvertido = {
+                id: payload.new.id,
+                status: payload.new.status,
+                service_type: 'frete',
+                origin_address: payload.new.origem_address || '',
+                destination_address: payload.new.destino_address || '',
+                quoted_price: payload.new.quoted_price,
+                created_at: payload.new.created_at,
+                motorista_id: payload.new.motorista_id,
+                motorista_nome: payload.new.motorista_nome,
+                motorista_whatsapp: payload.new.motorista_whatsapp,
+                origin_lat: payload.new.origem_lat,
+                origin_lng: payload.new.origem_lng,
+                destination_lat: payload.new.destino_lat,
+                destination_lng: payload.new.destino_lng,
+                _is_frete: true,
+              }
+              setMeusPedidos(prev => [freteConvertido as Trip, ...prev])
             }
           }
         }
@@ -237,27 +305,93 @@ export default function MotoqueiroPedidos() {
     }
   }
 
+  const carregarFretes = async () => {
+    const { data } = await supabase
+      .from('fretes')
+      .select('*')
+      .eq('status', 'pendente')
+      .order('created_at', { ascending: false })
+    if (data) {
+      const fretesConvertidos = data.map((f: any) => ({
+        id: f.id,
+        status: f.status,
+        service_type: 'frete',
+        origin_address: f.origem_address || '',
+        destination_address: f.destino_address || '',
+        quoted_price: f.quoted_price,
+        created_at: f.created_at,
+        motorista_id: null,
+        origin_lat: f.origem_lat,
+        origin_lng: f.origem_lng,
+        destination_lat: f.destino_lat,
+        destination_lng: f.destino_lng,
+        foto_url: f.foto_url || null,
+        cliente_whatsapp: f.whatsapp || null,
+        _is_frete: true,
+      }))
+      setFretes(fretesConvertidos)
+    }
+  }
+
   const carregarMeusPedidos = async () => {
     if (!motorista) return
-
-    const { data, error } = await supabase
+    
+    const { data: tripsData } = await supabase
       .from('trips')
       .select('*')
       .in('status', ['ASSIGNED', 'assigned', 'ACCEPTED', 'accepted'])
       .eq('motorista_id', motorista.id)
       .order('created_at', { ascending: false })
-
-    console.log('Meus pedidos:', data, 'Erro:', error)
-
-    if (data) {
-      setMeusPedidos(data as Trip[])
-    }
+    
+    const { data: fretesData } = await supabase
+      .from('fretes')
+      .select('*')
+      .eq('status', 'aceite')
+      .eq('motorista_id', motorista.id)
+      .order('created_at', { ascending: false })
+    
+    const fretesConvertidos = (fretesData ?? []).map((f: any) => ({
+      id: f.id,
+      status: f.status,
+      service_type: 'frete',
+      origin_address: f.origem_address || '',
+      destination_address: f.destino_address || '',
+      quoted_price: f.quoted_price,
+      created_at: f.created_at,
+      motorista_id: f.motorista_id,
+      origin_lat: f.origem_lat,
+      origin_lng: f.origem_lng,
+      destination_lat: f.destino_lat,
+      destination_lng: f.destino_lng,
+      _is_frete: true,
+    }))
+    
+    setMeusPedidos([...(tripsData ?? []), ...fretesConvertidos] as Trip[])
   }
 
-  const aceitarPedido = async (tripId: string) => {
+  const aceitarPedido = async (tripId: string, isFrete?: boolean) => {
     if (!motorista) return
     if (aceitando === tripId) return
     setAceitando(tripId)
+
+    if (isFrete) {
+      const { error } = await supabase
+        .from('fretes')
+        .update({
+          status: 'aceite',
+          motorista_id: motorista.id,
+          motorista_nome: `${motorista.nome} ${motorista.ultimo_nome || ''}`.trim(),
+          motorista_whatsapp: motorista.whatsapp,
+        })
+        .eq('id', tripId)
+        .eq('status', 'pendente')
+
+      if (!error) {
+        setFretes(prev => prev.filter(f => f.id !== tripId))
+      }
+      setAceitando(null)
+      return
+    }
 
     const { error } = await supabase
       .from('trips')
@@ -266,15 +400,13 @@ export default function MotoqueiroPedidos() {
         motorista_id: motorista.id,
         motorista_nome: `${motorista.nome} ${motorista.ultimo_nome || ''}`.trim(),
         motorista_whatsapp: motorista.whatsapp,
-        motorista_foto_url: motorista.foto_url || null,
-        updated_at: new Date().toISOString()
+        motorista_foto_url: motorista.foto_url || null
       })
       .eq('id', tripId)
       .in('status', ['PENDING', 'pending', 'REQUESTED', 'requested'])
 
     if (error) {
       console.error('Erro ao aceitar pedido:', error)
-      setPedidos(prev => prev.filter(p => p.id !== tripId))
       setAceitando(null)
       return
     }
@@ -282,7 +414,6 @@ export default function MotoqueiroPedidos() {
     const pedidoAceite = pedidos.find(p => p.id === tripId)
     if (pedidoAceite) {
       setMeusPedidos(prev => {
-        // Verifica se já existe antes de adicionar
         if (prev.some(p => p.id === tripId)) return prev
         return [{
           ...pedidoAceite,
@@ -333,6 +464,17 @@ export default function MotoqueiroPedidos() {
       }
     }
     notificar()
+  }
+
+  const getNomeServico = (serviceType?: string) => {
+    switch (serviceType) {
+      case 'moto': return 'Moto-Táxi'
+      case 'frete': return 'Frete'
+      case 'farmacia': return 'Farmácia'
+      case 'documentos': return 'Documentos'
+      case 'familiar': return 'Familiar'
+      default: return serviceType || 'Moto-Táxi'
+    }
   }
 
   const getServiceIcon = (serviceType?: string) => {
@@ -407,7 +549,11 @@ export default function MotoqueiroPedidos() {
     setPedidoSelecionado(trip)
     
     if (!trip.origin_lat || !trip.origin_lng || 
-        !trip.destination_lat || !trip.destination_lng) return
+        !trip.destination_lat || !trip.destination_lng) {
+      setMapaLoading(false)
+      setRota([])
+      return
+    }
     
     setMapaLoading(true)
     try {
@@ -429,7 +575,9 @@ export default function MotoqueiroPedidos() {
     setMapaLoading(false)
   }
 
-  const pedidosFiltrados = pedidos.filter(pedido => {
+  const todosPedidos = [...pedidos, ...fretes]
+
+  const pedidosFiltrados = todosPedidos.filter(pedido => {
     if (filtro === 'Todos') return true
     if (filtro === 'Moto-Táxi') return pedido.service_type === 'moto' || !pedido.service_type
     if (filtro === 'Frete') return pedido.service_type === 'frete'
@@ -442,7 +590,12 @@ export default function MotoqueiroPedidos() {
     return (
       <div className="moto-pedidos">
         <div className="moto-login">
-          <h1>🏍️ Motoqueiro</h1>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center' }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 17h-2v-5l2.5-3h3l2 3h5v5M9 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm8 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+            </svg>
+            Motoqueiro
+          </h1>
           <p>{modoLogin === 'login' ? 'Entre com seus dados para ver pedidos disponíveis' : 'Crie sua conta para começar'}</p>
           
           {erro && (
@@ -715,7 +868,7 @@ export default function MotoqueiroPedidos() {
                } : undefined}>
             <div className="moto-card__tipo">
               {getServiceIcon(pedido.service_type)}
-              {pedido.service_type || 'Moto-Táxi'}
+              {getNomeServico(pedido.service_type)}
             </div>
             <div className="moto-card__rota">
               <strong>De:</strong> {pedido.origin_address}
@@ -755,7 +908,7 @@ export default function MotoqueiroPedidos() {
                } : undefined}>
             <div className="moto-card__tipo">
               {getServiceIcon(pedido.service_type)}
-              {pedido.service_type || 'Moto-Táxi'}
+              {getNomeServico(pedido.service_type)}
             </div>
             <div className="moto-card__rota">
               <strong>De:</strong> {pedido.origin_address}
@@ -763,6 +916,21 @@ export default function MotoqueiroPedidos() {
             <div className="moto-card__rota">
               <strong>Para:</strong> {pedido.destination_address}
             </div>
+            {pedido.service_type === 'frete' && (
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px', alignItems: 'center' }}>
+                {pedido.foto_url && (
+                  <img src={pedido.foto_url} alt="Material" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: '8px' }} />
+                )}
+                {pedido.cliente_whatsapp && (
+                  <a href={`https://wa.me/${pedido.cliente_whatsapp.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontWeight: 600, fontSize: '0.85rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    {pedido.cliente_whatsapp}
+                  </a>
+                )}
+              </div>
+            )}
             <div className="moto-card__preco">{formatPrice(pedido.quoted_price)}</div>
             <div className="moto-card__footer">
               <span className="moto-card__data">{formatData(pedido.created_at)}</span>
@@ -770,7 +938,7 @@ export default function MotoqueiroPedidos() {
                 className="moto-card__aceitar"
                 onClick={(e) => {
                   e.stopPropagation()
-                  aceitarPedido(pedido.id)
+                  aceitarPedido(pedido.id, (pedido as any)._is_frete)
                 }}
                 disabled={aceitando === pedido.id}
                 style={{ opacity: aceitando === pedido.id ? 0.6 : 1 }}

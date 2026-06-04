@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Clock, MapPin, X } from 'lucide-react'
+import { Clock, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
 import './TripAcceptedView.css'
@@ -93,7 +93,7 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [tripId, tripDetails, onNewTrip])
+  }, [tripId, onNewTrip])
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-AO', {

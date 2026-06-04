@@ -153,7 +153,7 @@ export default function MapDashboard() {
 
     const { data: tripRows, count } = await supabase
       .from('trips')
-      .select('id,status,quoted_price,final_price,service_id,driver_id,passenger_id,requested_at,metadata,origin_lat,origin_lng,destination_lat,destination_lng,origin_address,destination_address', { count: 'exact' })
+      .select('id,status,quoted_price,final_price,service_id,service_type,driver_id,passenger_id,requested_at,metadata,origin_lat,origin_lng,destination_lat,destination_lng,origin_address,destination_address', { count: 'exact' })
       .order('requested_at', { ascending: false })
       .range(from, to)
 
@@ -165,7 +165,8 @@ export default function MapDashboard() {
     setTrips(
       (tripRows ?? []).map((row) => {
         const serviceTypeFromMetadata = (row.metadata as any)?.service_type as string
-        const serviceType = (serviceTypeFromMetadata as TripRow['serviceType']) || (serviceMap.get(String(row.service_id)) ?? 'taxi')
+        const serviceTypeFromColumn = row.service_type as string
+        const serviceType = serviceTypeFromColumn || serviceTypeFromMetadata || (serviceMap.get(String(row.service_id)) ?? 'taxi')
 
         return {
           id: String(row.id),
