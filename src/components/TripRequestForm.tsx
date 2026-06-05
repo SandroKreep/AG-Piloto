@@ -151,8 +151,8 @@ export default function TripRequestForm({
   setOriginCoords: (coords: Coordinates | null) => void
   onReset?: () => void
   onOriginManuallyChosen?: () => void
-}) {{ user } = useAuthStore()
-  const 
+}) {
+  const { user } = useAuthStore() 
   const [originAddress, setOriginAddress] = useState(() => {
     return sessionStorage.getItem('ag_origin_address') || ''
   })
