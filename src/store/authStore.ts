@@ -16,7 +16,7 @@ type AuthState = {
   setLoading: (loading: boolean) => void
   setShowAuthModal: (show: boolean, pendingAction?: () => void) => void
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  register: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>
+  register: (email: string, password: string, name: string, whatsapp: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
   checkSession: () => Promise<void>
 }
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  register: async (email, password, name) => {
+  register: async (email, password, name, whatsapp) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -98,6 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
               id: data.user.id,
               email: data.user.email,
               name,
+              whatsapp,
             },
           ])
 

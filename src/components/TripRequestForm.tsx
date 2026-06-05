@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
 import { reverseGeocodeCoordinates } from '../lib/geoUtils'
 import TripAcceptedView from './TripAcceptedView'
+import { useAuthStore } from '../store/authStore'
 import './TripRequestForm.css'
 
 // Helper function to format currency
@@ -150,7 +151,8 @@ export default function TripRequestForm({
   setOriginCoords: (coords: Coordinates | null) => void
   onReset?: () => void
   onOriginManuallyChosen?: () => void
-}) {
+}) {{ user } = useAuthStore()
+  const 
   const [originAddress, setOriginAddress] = useState(() => {
     return sessionStorage.getItem('ag_origin_address') || ''
   })
@@ -584,6 +586,7 @@ export default function TripRequestForm({
             destination_lat: finalDestinationLat,
             destination_lng: finalDestinationLng,
             quoted_price: quotedPrice,
+            user_id: user?.id ?? null,
           },
         ])
         .select('id');

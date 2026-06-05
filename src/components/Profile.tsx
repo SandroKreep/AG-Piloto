@@ -75,10 +75,10 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from('trips')
-        .select('*')
-        .eq('customer_id', user.id)
+        .select('id, created_at, origin_address, destination_address, quoted_price, status')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(10)
+        .limit(20)
 
       if (error) throw error
 

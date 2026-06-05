@@ -10,6 +10,7 @@ export default function AuthModal() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [whatsapp, setWhatsapp] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -20,6 +21,7 @@ export default function AuthModal() {
     setEmail('')
     setPassword('')
     setName('')
+    setWhatsapp('')
     setError('')
   }
 
@@ -41,7 +43,7 @@ export default function AuthModal() {
     setLoading(true)
     setError('')
 
-    const result = await register(email, password, name)
+    const result = await register(email, password, name, whatsapp)
     
     if (!result.success) {
       setError(result.error || 'Erro ao criar conta')
@@ -140,6 +142,20 @@ export default function AuthModal() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 autoComplete="name"
+              />
+            </div>
+
+            <div className="auth-modal__field">
+              <label htmlFor="register-whatsapp" className="auth-modal__label">WhatsApp</label>
+              <input
+                id="register-whatsapp"
+                type="tel"
+                className="auth-modal__input"
+                placeholder="+244 9XX XXX XXX"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                required
+                autoComplete="tel"
               />
             </div>
 
