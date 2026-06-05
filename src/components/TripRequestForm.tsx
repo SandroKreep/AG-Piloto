@@ -631,42 +631,6 @@ export default function TripRequestForm({
     setShowSummary(false)
   }
 
-  // Show trip accepted notification with new component
-  if (tripAccepted && activeTripId) {
-    return (
-      <TripAcceptedView
-        tripId={activeTripId}
-        driverName={acceptedDriver}
-        onNewTrip={() => {
-          setShowSummary(false)
-          setTripAccepted(false)
-          setActiveTripId(null)
-          localStorage.removeItem('activeTripId')
-          setOriginAddress('')
-          setDestinationAddress(null)
-          setDestinationCoords(null)
-          setWaitingSeconds(0)
-          setDriverLocation(null)
-          // Reset GPS flag and coords for new trip
-          destinoFixo.current = false
-          originCoordsRef.current = null
-          originFixed.current = false
-          originLockedRef.current = false
-          // Reset origin autocomplete states
-          setOriginSuggestions([])
-          setShowOriginSuggestions(false)
-          setOriginSearchLoading(false)
-          setUserEditedOrigin(false)
-          // Clear sessionStorage when starting new trip
-          sessionStorage.removeItem('ag_origin_address')
-          sessionStorage.removeItem('ag_destination_coords')
-          sessionStorage.removeItem('ag_destination_address')
-          if (waitingTimerRef.current) clearInterval(waitingTimerRef.current)
-        }}
-      />
-    )
-  }
-
   // Show summary before confirming trip
   if (showSummary && routeData) {
     return (
@@ -981,6 +945,35 @@ export default function TripRequestForm({
             </p>
           </div>
         </div>
+      )}
+      {tripAccepted && activeTripId && (
+        <TripAcceptedView
+          tripId={activeTripId}
+          driverName={acceptedDriver}
+          onNewTrip={() => {
+            setShowSummary(false)
+            setTripAccepted(false)
+            setActiveTripId(null)
+            localStorage.removeItem('activeTripId')
+            setOriginAddress('')
+            setDestinationAddress(null)
+            setDestinationCoords(null)
+            setWaitingSeconds(0)
+            setDriverLocation(null)
+            destinoFixo.current = false
+            originCoordsRef.current = null
+            originFixed.current = false
+            originLockedRef.current = false
+            setOriginSuggestions([])
+            setShowOriginSuggestions(false)
+            setOriginSearchLoading(false)
+            setUserEditedOrigin(false)
+            sessionStorage.removeItem('ag_origin_address')
+            sessionStorage.removeItem('ag_destination_coords')
+            sessionStorage.removeItem('ag_destination_address')
+            if (waitingTimerRef.current) clearInterval(waitingTimerRef.current)
+          }}
+        />
       )}
     </form>
   )

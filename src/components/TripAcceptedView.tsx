@@ -23,6 +23,7 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
   const [tripDetails, setTripDetails] = useState<any>(null)
   const [routeInfo, setRouteInfo] = useState<{ distanceKm: number; durationMin: number } | null>(null)
   const [loading, setLoading] = useState(true)
+  const [minimizado, setMinimizado] = useState(false)
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -104,6 +105,37 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
     }).format(value)
   }
 
+  if (minimizado) {
+    return (
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        background: '#ff6b00', color: '#fff',
+        padding: '14px 20px', zIndex: 9999,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        boxShadow: '0 -4px 16px rgba(0,0,0,0.2)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 17h-2v-5l2.5-3h3l2 3h5v5M9 18.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm8 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+          </svg>
+          <span style={{ fontWeight: 700 }}>
+            {tripDetails?.motorista_nome || 'Motoqueiro'} está a caminho
+          </span>
+        </div>
+        <button
+          onClick={() => setMinimizado(false)}
+          style={{
+            background: 'white', color: '#ff6b00', border: 'none',
+            borderRadius: '20px', padding: '6px 16px',
+            fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer'
+          }}
+        >
+          Ver detalhes
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="trip-accepted-view">
       <div className="trip-accepted-header">
@@ -115,8 +147,8 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
             Motoqueiro está a caminho para buscar você
           </p>
         </div>
-        <button className="close-btn" onClick={onNewTrip}>
-          <X size={20} />
+        <button className="close-btn" onClick={() => setMinimizado(true)}>
+          Ocultar
         </button>
       </div>
 
