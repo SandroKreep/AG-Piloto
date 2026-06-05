@@ -956,7 +956,7 @@ export default function TripRequestForm({
               justifyContent: 'center',
               margin: '0 auto 16px',
               boxShadow: '0 0 0 8px rgba(34,197,94,0.15)',
-              animation: 'pulse 1.5s ease infinite',
+              animation: 'pulseGreen 1.5s ease infinite',
             }}>
               <svg width="32" height="32" viewBox="0 0 24 24"
                 fill="none" stroke="white" strokeWidth="3"

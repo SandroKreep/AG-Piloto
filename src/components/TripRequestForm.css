@@ -338,7 +338,7 @@
   to { transform: scale(1); opacity: 1; }
 }
 
-@keyframes pulse {
+@keyframes pulseGreen {
   0%, 100% { box-shadow: 0 0 0 8px rgba(34,197,94,0.15); }
   50% { box-shadow: 0 0 0 16px rgba(34,197,94,0.05); }
 }
