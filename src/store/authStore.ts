@@ -115,7 +115,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: {
             id: data.user.id,
             email: data.user.email!,
-            name,
+            full_name: name,
           },
           showAuthModal: false,
         })

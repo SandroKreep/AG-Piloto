@@ -52,7 +52,7 @@ export default function DesktopHeader({ active, onChange }: Props) {
         </nav>
         {user ? (
           <div className="desktop-header__user-info">
-            <span className="desktop-header__user-name">{user.name || user.email}</span>
+            <span className="desktop-header__user-name">{user.full_name || user.email}</span>
             <button
               type="button"
               className="desktop-header__logout"
