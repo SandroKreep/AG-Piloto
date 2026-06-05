@@ -8,8 +8,9 @@ import './Profile.css'
 type Profile = {
   id: string
   email: string
-  name: string | null
-  phone: string | null
+  full_name?: string
+  phone?: string
+  whatsapp?: string
 }
 
 type Trip = {
@@ -50,7 +51,7 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, email, full_name, phone, whatsapp')
         .eq('id', user.id)
         .single()
 
@@ -58,7 +59,7 @@ export default function Profile() {
 
       if (data) {
         setProfile(data as Profile)
-        setEditName(data.name || '')
+        setEditName(data.full_name || '')
         setEditPhone(data.phone || '')
       }
     } catch (error) {
@@ -96,14 +97,14 @@ export default function Profile() {
       const { error } = await supabase
         .from('profiles')
         .update({
-          name: editName,
+          full_name: editName,
           phone: editPhone,
         })
         .eq('id', user.id)
 
       if (error) throw error
 
-      setProfile(prev => prev ? { ...prev, name: editName, phone: editPhone } : null)
+      setProfile(prev => prev ? { ...prev, full_name: editName, phone: editPhone } : null)
       setEditing(false)
       addToast('Perfil atualizado com sucesso', 'success')
     } catch (error) {
@@ -115,7 +116,7 @@ export default function Profile() {
   }
 
   const handleCancelEdit = () => {
-    setEditName(profile?.name || '')
+    setEditName(profile?.full_name || '')
     setEditPhone(profile?.phone || '')
     setEditing(false)
   }
@@ -245,7 +246,7 @@ export default function Profile() {
             <div className="profile__info">
               <div className="profile__info-row">
                 <span className="profile__info-label">Nome</span>
-                <span className="profile__info-value">{profile?.name || 'Não definido'}</span>
+                <span className="profile__info-value">{profile?.full_name || 'Não definido'}</span>
               </div>
               
               <div className="profile__info-row">

@@ -4,7 +4,9 @@ import { supabase } from '../lib/supabase'
 type User = {
   id: string
   email: string
-  name?: string
+  full_name?: string
+  phone?: string
+  whatsapp?: string
 }
 
 type AuthState = {
@@ -47,7 +49,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (data.user) {
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('name')
+          .select('full_name, phone, whatsapp')
           .eq('id', data.user.id)
           .single()
 
@@ -55,7 +57,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: {
             id: data.user.id,
             email: data.user.email!,
-            name: profileData?.name || data.user.user_metadata?.name,
+            full_name: profileData?.full_name || data.user.user_metadata?.full_name,
+            phone: profileData?.phone || undefined,
+            whatsapp: profileData?.whatsapp || undefined,
           },
           showAuthModal: false,
         })
@@ -97,7 +101,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             {
               id: data.user.id,
               email: data.user.email,
-              name,
+              full_name: name,
               whatsapp,
             },
           ])
@@ -149,7 +153,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (session?.user) {
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('name')
+          .select('full_name, phone, whatsapp')
           .eq('id', session.user.id)
           .single()
 
@@ -157,7 +161,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user: {
             id: session.user.id,
             email: session.user.email!,
-            name: profileData?.name || session.user.user_metadata?.name,
+            full_name: profileData?.full_name || session.user.user_metadata?.full_name,
+            phone: profileData?.phone || undefined,
+            whatsapp: profileData?.whatsapp || undefined,
           },
           isLoading: false,
         })
