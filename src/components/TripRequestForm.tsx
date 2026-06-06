@@ -744,7 +744,7 @@ export default function TripRequestForm({
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+      <div className="trip-form__grid">
         <div style={{ position: 'relative' }} ref={originContainerRef}>
           <label style={{ fontSize: '11px', color: '#999', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>ORIGEM</label>
           <input
@@ -845,13 +845,11 @@ export default function TripRequestForm({
         <label style={{ fontSize: '11px', color: '#999', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>TIPO DE SERVIÇO</label>
         <select
           value={serviceType}
-          onChange={(e) => setServiceType(e.target.value as 'moto' | 'carro' | 'caminhao')}
+          onChange={(e) => setServiceType(e.target.value as 'moto')}
           style={{ ...inputStyles, width: '100%' }}
           required
         >
           <option value="moto">Moto-Táxi</option>
-          <option value="caminhao">Frete</option>
-          <option value="carro">Familiar</option>
         </select>
       </div>
 
