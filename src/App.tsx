@@ -36,9 +36,9 @@ function MainApp() {
 
   return (
     <div className="app-root">
-      <DesktopHeader active={tab} onChange={setTab} />
+      {tab !== 'home' && <DesktopHeader active={tab} onChange={setTab} />}
       <div className="app-shell">
-        <main className="app-main">
+        <main className={`app-main ${tab === 'home' ? 'app-main--full' : ''}`}>
           {tab === 'home' && <HomeView onGoDriver={() => setTab('driver')} />}
           {tab === 'orders' && <TripHistoryWrapper />}
           {tab === 'driver' && (

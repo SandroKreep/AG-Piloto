@@ -18,17 +18,10 @@ const formatCurrency = (value: number) => {
 
 // Basic styling for the form (can be moved to CSS module later)
 const formStyles: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '15px',
-  padding: '20px',
-  borderRadius: '16px',
-  backgroundColor: 'white',
-  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12)',
+  background: '#fff',
+  boxShadow: 'none',
   border: 'none',
-  maxWidth: 'min(400px, 95vw)',
-  margin: '20px auto',
-  width: '100%',
+  padding: '24px',
 }
 
 const inputStyles: React.CSSProperties = {
@@ -164,13 +157,26 @@ export default function TripRequestForm({
   const [showPermissionWarning, setShowPermissionWarning] = useState(false)
   const [gpsObtained, setGpsObtained] = useState(false)
   const [isGeocoding, setIsGeocoding] = useState(false)
-  const [activeTripId, setActiveTripId] = useState<string | null>(null)
-  
+  const [activeTripId, setActiveTripId] = useState<string | null>(
+    () => localStorage.getItem('activeTripId')
+  )
+
   // New states for route summary
   const [routeData, setRouteData] = useState<{ distanceKm: number; durationMin: number; price: number | null } | null>(null)
   const [routeLoading, setRouteLoading] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
-  const [tripAccepted, setTripAccepted] = useState(false)
+  const [tripAccepted, setTripAccepted] = useState(
+    () => !!localStorage.getItem('activeTripId')
+  )
+
+  useEffect(() => {
+    if (activeTripId) {
+      localStorage.setItem('activeTripId', activeTripId)
+    } else {
+      localStorage.removeItem('activeTripId')
+    }
+  }, [activeTripId])
+
   const [acceptedDriver, setAcceptedDriver] = useState<string | null>(null)
   const [waitingSeconds, setWaitingSeconds] = useState(0)
   const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -442,6 +448,8 @@ export default function TripRequestForm({
       return
     }
 
+    let isMounted = true
+
     console.log('🔍 DEBUG: Setting up listener for trip', activeTripId)
 
     // Request notification permission
@@ -456,6 +464,7 @@ export default function TripRequestForm({
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'trips', filter: `id=eq.${activeTripId}` },
         (payload: any) => {
+          if (!isMounted) return
           console.log('DEBUG: Trip update received:', payload)
           console.log('DEBUG: New status:', payload.new.status)
           console.log('DEBUG: Expected: ASSIGNED, Got:', payload.new.status)
@@ -484,6 +493,7 @@ export default function TripRequestForm({
       .subscribe()
 
     return () => {
+      isMounted = false
       if (subscriptionRef.current) {
         subscriptionRef.current.unsubscribe()
       }
@@ -698,8 +708,6 @@ export default function TripRequestForm({
   // Show initial form
   return (
     <form style={formStyles} className="trip-form" onSubmit={handleShowSummary}>
-      <h2 style={{ color: '#1f2937', textAlign: 'center' }}>Solicitar Nova Viagem</h2>
-      
       {gpsObtained && (
         <div className="gps-obtido" style={{ marginBottom: '10px', textAlign: 'center' }}>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -709,7 +717,7 @@ export default function TripRequestForm({
           Localização GPS obtida!
         </div>
       )}
-      
+
       {showPermissionWarning && locationPermission === 'denied' && (
         <div style={{ color: '#F97316', marginBottom: '10px', fontSize: '14px' }}>
           Para sua segurança, a localização exata ajuda o motorista. Deseja continuar apenas com o endereço de texto?
@@ -735,115 +743,121 @@ export default function TripRequestForm({
           Rota calculada: {routeData.distanceKm} km · {routeData.durationMin} min · {formatCurrency(routeData.price || 0)}
         </div>
       )}
-      
-      <div style={{ position: 'relative' }} ref={originContainerRef}>
-        <input
-          ref={originInputRef}
-          type="text"
-          placeholder={originAddress ? originAddress : gpsObtained ? 'A obter endereço...' : 'Endereço de Origem'}
-          value={originAddress}
-          onChange={(e) => {
-            setOriginAddress(e.target.value)
-            buscarSugestoesOrigem(e.target.value)
-          }}
-          style={{ ...inputStyles, paddingRight: originSearchLoading ? '40px' : '10px' }}
-          required
-        />
-        {originSearchLoading && (
-          <div style={{
-            position: 'absolute',
-            right: '10px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-          }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="trip-form__spinner">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" />
-              <path d="M12 2a10 10 0 0 1 10 10" />
-            </svg>
-          </div>
-        )}
-        {showOriginSuggestions && originSuggestions.length > 0 && (
-          <div style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            background: 'white',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            zIndex: 1000,
-            maxHeight: '300px',
-            overflowY: 'auto',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            marginTop: '4px'
-          }}>
-            {originSuggestions.map((s) => (
-              <div
-                key={s.place_id}
-                onClick={() => selecionarSugestaoOrigem(s)}
-                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                {s.display_name}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      
-      <div style={{ position: 'relative' }}>
-        <input
-          type="text"
-          value={destinoTexto}
-          onChange={(e) => buscarSugestoes(e.target.value)}
-          placeholder="Escreve o destino..."
-          style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white', color: '#1f2937', fontSize: '16px', outline: 'none', transition: 'border-color 0.2s' }}
-        />
-        {mostrarSugestoes && sugestoes.length > 0 && (
-          <div style={{
-            position: 'absolute', top: '100%', left: 0, right: 0,
-            background: 'white', border: '1px solid #ddd', borderRadius: '8px',
-            zIndex: 1000, maxHeight: '300px', overflowY: 'auto',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-          }}>
-            {sugestoes.map((s) => (
-              <div
-                key={s.place_id}
-                onClick={() => selecionarSugestao(s)}
-                style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                {s.display_name}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      
-      <select
-        value={serviceType}
-        onChange={(e) => setServiceType(e.target.value as 'moto' | 'carro' | 'caminhao')}
-        style={inputStyles}
-        required
-      >
-        <option value="moto">Moto-Táxi</option>
-        <option value="caminhao">Frete</option>
-        <option value="carro">Familiar</option>
-      </select>
 
-      <button 
-        type="submit" 
-        style={buttonStyles} 
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div style={{ position: 'relative' }} ref={originContainerRef}>
+          <label style={{ fontSize: '11px', color: '#999', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>ORIGEM</label>
+          <input
+            ref={originInputRef}
+            type="text"
+            placeholder={originAddress ? originAddress : gpsObtained ? 'A obter endereço...' : 'Endereço de Origem'}
+            value={originAddress}
+            onChange={(e) => {
+              setOriginAddress(e.target.value)
+              buscarSugestoesOrigem(e.target.value)
+            }}
+            style={{ ...inputStyles, paddingRight: originSearchLoading ? '40px' : '10px' }}
+            required
+          />
+          {originSearchLoading && (
+            <div style={{
+              position: 'absolute',
+              right: '10px',
+              top: 'calc(50% + 12px)',
+              transform: 'translateY(-50%)',
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="trip-form__spinner">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.3" />
+                <path d="M12 2a10 10 0 0 1 10 10" />
+              </svg>
+            </div>
+          )}
+          {showOriginSuggestions && originSuggestions.length > 0 && (
+            <div style={{
+              position: 'absolute',
+              top: 'calc(100% + 4px)',
+              left: 0,
+              right: 0,
+              background: 'white',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              zIndex: 1000,
+              maxHeight: '300px',
+              overflowY: 'auto',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            }}>
+              {originSuggestions.map((s) => (
+                <div
+                  key={s.place_id}
+                  onClick={() => selecionarSugestaoOrigem(s)}
+                  style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  {s.display_name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div style={{ position: 'relative' }}>
+          <label style={{ fontSize: '11px', color: '#999', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>DESTINO</label>
+          <input
+            type="text"
+            value={destinoTexto}
+            onChange={(e) => buscarSugestoes(e.target.value)}
+            placeholder="Escreve o destino..."
+            style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '4px', backgroundColor: 'white', color: '#1f2937', fontSize: '16px', outline: 'none', transition: 'border-color 0.2s' }}
+          />
+          {mostrarSugestoes && sugestoes.length > 0 && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0,
+              background: 'white', border: '1px solid #ddd', borderRadius: '8px',
+              zIndex: 1000, maxHeight: '300px', overflowY: 'auto',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            }}>
+              {sugestoes.map((s) => (
+                <div
+                  key={s.place_id}
+                  onClick={() => selecionarSugestao(s)}
+                  style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  {s.display_name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '12px' }}>
+        <label style={{ fontSize: '11px', color: '#999', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>TIPO DE SERVIÇO</label>
+        <select
+          value={serviceType}
+          onChange={(e) => setServiceType(e.target.value as 'moto' | 'carro' | 'caminhao')}
+          style={{ ...inputStyles, width: '100%' }}
+          required
+        >
+          <option value="moto">Moto-Táxi</option>
+          <option value="caminhao">Frete</option>
+          <option value="carro">Familiar</option>
+        </select>
+      </div>
+
+      <button
+        type="submit"
+        style={{ ...buttonStyles, width: '100%', marginTop: '8px' }}
         disabled={loading || !destinationCoords || routeLoading}
       >
         {routeLoading ? 'Calculando rota...' : loading ? 'Solicitando...' : 'Próximo'}

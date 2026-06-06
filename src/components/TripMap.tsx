@@ -322,21 +322,23 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
       };
       fetchActiveTrip();
 
-      // Set up real-time listener for the active trip (e.g., status changes)
+      // Remove canal anterior se existir
+      supabase.removeAllChannels()
+
       const channel = supabase
         .channel(`trip-${activeTripId}`)
         .on(
           'postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'trips', filter: `id=eq.${activeTripId}` },
           (payload) => {
-            setActiveTrip(payload.new as Trip);
+            setActiveTrip(payload.new as Trip)
           }
         )
-        .subscribe();
+        .subscribe()
 
       return () => {
-        channel.unsubscribe();
-      };
+        supabase.removeChannel(channel)
+      }
     }
   }, [activeTripId]);
 
