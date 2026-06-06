@@ -7,7 +7,6 @@ import './Profile.css'
 
 type Profile = {
   id: string
-  email: string
   full_name?: string
   phone?: string
   whatsapp?: string
@@ -51,7 +50,7 @@ export default function Profile() {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, phone, whatsapp')
+        .select('id, full_name, phone, whatsapp')
         .eq('id', user.id)
         .single()
 

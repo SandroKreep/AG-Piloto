@@ -26,6 +26,12 @@
   min-height: 100%;
 }
 
+.app-main--full {
+  padding: 0 0 calc(var(--nav-height));
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 /* Telefone: barra inferior; conteúdo identado como app */
 @media (max-width: 767.98px) {
   .app-root {
@@ -33,7 +39,6 @@
   }
 }
 
-/* PC / tablet largo: site, cabeçalho no topo, sem barra inferior, conteúdo centrado e largo */
 @media (min-width: 768px) {
   .app-root {
     background: transparent;

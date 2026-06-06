@@ -1,5 +1,8 @@
 .home {
-  padding-bottom: 8px;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Navbar */
@@ -8,12 +11,15 @@
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #1a1a2e;
   padding: 16px 40px;
   z-index: 1000;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 .home__navbar-brand {
@@ -61,13 +67,12 @@
 
 /* Hero Section */
 .home__hero {
-  overflow: hidden;
   position: relative;
   height: 380px;
-  margin-top: 64px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
   width: 100%;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
 }
 
 .home__hero-map {
