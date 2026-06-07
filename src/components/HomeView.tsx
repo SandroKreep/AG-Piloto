@@ -126,7 +126,7 @@ type Props = {
 
 export default function HomeView({ onGoDriver }: Props) {
   const navigate = useNavigate()
-  const setShowAuthModal = useAuthStore((state) => state.setShowAuthModal)
+  const { user, setShowAuthModal } = useAuthStore()
   const [destinationCoords, setDestinationCoords] = useState<Coordinates | null>(() => {
     const saved = sessionStorage.getItem('ag_destination_coords')
     return saved ? JSON.parse(saved) : null
@@ -194,9 +194,15 @@ export default function HomeView({ onGoDriver }: Props) {
           <a href="#" className="home__navbar-link" onClick={onGoDriver}>Motoqueiro</a>
           <a href="#" className="home__navbar-link">Perfil</a>
         </div>
-        <button type="button" className="home__navbar-btn" onClick={() => setShowAuthModal(true)}>
-          Entrar
-        </button>
+        {user ? (
+          <span style={{ color: '#fff', fontSize: '14px' }}>
+            {user.full_name || user.email}
+          </span>
+        ) : (
+          <button type="button" className="home__navbar-btn" onClick={() => setShowAuthModal(true)}>
+            Entrar
+          </button>
+        )}
       </nav>
 
       <section className="home__hero">
