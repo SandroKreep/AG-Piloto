@@ -36,6 +36,8 @@ type Trip = {
 }
 
 export default function MotoqueiroPedidos() {
+  const [installPrompt, setInstallPrompt] = useState<any>(null)
+  const [showInstallBtn, setShowInstallBtn] = useState(false)
   const [motorista, setMotorista] = useState<Motorista | null>(null)
   const [nome, setNome] = useState('')
   const [ultimoNome, setUltimoNome] = useState('')
@@ -59,8 +61,17 @@ export default function MotoqueiroPedidos() {
   useEffect(() => {
     const link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
     if (link) link.href = '/manifest-moto.webmanifest'
+    
+    const handler = (e: any) => {
+      e.preventDefault()
+      setInstallPrompt(e)
+      setShowInstallBtn(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    
     return () => {
       if (link) link.href = '/manifest.webmanifest'
+      window.removeEventListener('beforeinstallprompt', handler)
     }
   }, [])
 
@@ -551,6 +562,13 @@ export default function MotoqueiroPedidos() {
     })
   }
 
+  const handleInstall = async () => {
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const result = await installPrompt.userChoice
+    if (result.outcome === 'accepted') setShowInstallBtn(false)
+  }
+
   const selecionarPedido = async (trip: Trip) => {
     if (pedidoSelecionado?.id === trip.id) {
       setPedidoSelecionado(null)
@@ -770,6 +788,20 @@ export default function MotoqueiroPedidos() {
             </div>
           </div>
         </div>
+        {showInstallBtn && (
+          <button onClick={handleInstall} style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: 'transparent', border: '1px solid #ff6b00',
+            color: '#ff6b00', borderRadius: '8px', padding: '7px 14px',
+            fontSize: '13px', cursor: 'pointer', marginRight: '8px'
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 16l-6-6h4V4h4v6h4l-6 6z" fill="currentColor"/>
+              <path d="M4 20h16v-2H4v2z" fill="currentColor"/>
+            </svg>
+            Instalar
+          </button>
+        )}
         <button onClick={handleLogout}>Sair</button>
       </div>
 

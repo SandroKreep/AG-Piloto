@@ -1,12 +1,53 @@
+import { useEffect, useState } from 'react'
 import MapDashboard from '../components/MapDashboard'
 import './AdminDashboard.css'
 
 export default function AdminDashboard() {
+  const [installPrompt, setInstallPrompt] = useState<any>(null)
+  const [showInstallBtn, setShowInstallBtn] = useState(false)
+
+  useEffect(() => {
+    const link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
+    if (link) link.href = '/manifest-admin.webmanifest'
+    
+    const handler = (e: any) => {
+      e.preventDefault()
+      setInstallPrompt(e)
+      setShowInstallBtn(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    
+    return () => {
+      if (link) link.href = '/manifest.webmanifest'
+      window.removeEventListener('beforeinstallprompt', handler)
+    }
+  }, [])
+
+  const handleInstall = async () => {
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const result = await installPrompt.userChoice
+    if (result.outcome === 'accepted') setShowInstallBtn(false)
+  }
   return (
     <div className="admin-page">
       <header className="admin-page__header">
         <span className="admin-page__badge">AG-PILOTO</span>
         <h1>Painel de Administração</h1>
+        {showInstallBtn && (
+          <button onClick={handleInstall} style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: 'transparent', border: '1px solid #1a1a2e',
+            color: '#1a1a2e', borderRadius: '8px', padding: '7px 14px',
+            fontSize: '13px', cursor: 'pointer'
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 16l-6-6h4V4h4v6h4l-6 6z" fill="currentColor"/>
+              <path d="M4 20h16v-2H4v2z" fill="currentColor"/>
+            </svg>
+            Instalar
+          </button>
+        )}
         <p>Base de Controle para monitoramento operacional, financeiro e intervenções em tempo real.</p>
         <a href="/admin/comida" style={{
           display: 'inline-flex',
