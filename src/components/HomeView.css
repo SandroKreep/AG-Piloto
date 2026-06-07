@@ -65,6 +65,24 @@
   box-shadow: 0 4px 12px rgba(255, 107, 0, 0.4);
 }
 
+.home__navbar-install {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.home__navbar-install:hover {
+  background: rgba(255,255,255,0.1);
+}
+
 /* Hero Section */
 .home__hero {
   position: relative;

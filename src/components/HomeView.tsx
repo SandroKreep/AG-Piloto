@@ -127,6 +127,8 @@ type Props = {
 export default function HomeView({ onGoDriver }: Props) {
   const navigate = useNavigate()
   const { user, setShowAuthModal } = useAuthStore()
+  const [installPrompt, setInstallPrompt] = useState<any>(null)
+  const [showInstallBtn, setShowInstallBtn] = useState(false)
   const [destinationCoords, setDestinationCoords] = useState<Coordinates | null>(() => {
     const saved = sessionStorage.getItem('ag_destination_coords')
     return saved ? JSON.parse(saved) : null
@@ -143,6 +145,23 @@ export default function HomeView({ onGoDriver }: Props) {
   const [resetMap, setResetMap] = useState(false)
   const [userChoseOrigin, setUserChoseOrigin] = useState(false)
   const [gpsCoords, setGpsCoords] = useState<Coordinates | null>(null)
+
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault()
+      setInstallPrompt(e)
+      setShowInstallBtn(true)
+    })
+  }, [])
+
+  const handleInstall = async () => {
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const result = await installPrompt.userChoice
+    if (result.outcome === 'accepted') {
+      setShowInstallBtn(false)
+    }
+  }
 
   useEffect(() => {
     if (originCoords && destinationCoords) {
@@ -194,6 +213,20 @@ export default function HomeView({ onGoDriver }: Props) {
           <a href="#" className="home__navbar-link" onClick={onGoDriver}>Motoqueiro</a>
           <a href="#" className="home__navbar-link">Perfil</a>
         </div>
+        {showInstallBtn && (
+          <button
+            type="button"
+            className="home__navbar-install"
+            onClick={handleInstall}
+            title="Instalar app"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 16l-6-6h4V4h4v6h4l-6 6z" fill="currentColor"/>
+              <path d="M4 20h16v-2H4v2z" fill="currentColor"/>
+            </svg>
+            Instalar
+          </button>
+        )}
         {user ? (
           <span style={{ color: '#fff', fontSize: '14px' }}>
             {user.full_name || user.email}
