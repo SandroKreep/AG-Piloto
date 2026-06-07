@@ -57,6 +57,14 @@ export default function MotoqueiroPedidos() {
   const [aceitando, setAceitando] = useState<string | null>(null)
 
   useEffect(() => {
+    const link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement
+    if (link) link.href = '/manifest-moto.webmanifest'
+    return () => {
+      if (link) link.href = '/manifest.webmanifest'
+    }
+  }, [])
+
+  useEffect(() => {
     const motoristaSalvo = localStorage.getItem('ag_motorista')
     if (motoristaSalvo) {
       setMotorista(JSON.parse(motoristaSalvo))
