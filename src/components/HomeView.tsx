@@ -316,7 +316,7 @@ export default function HomeView({ onGoDriver }: Props) {
 
       <section className="home__section home__section--padded" aria-labelledby="more-services">
         <h2 id="more-services" className="home__section-title home__section-title--plain">
-          Mais,
+          Mais
         </h2>
         <div className="home__grid home__grid--2 home__grid--more">
           {moreServices.map((item) => (
