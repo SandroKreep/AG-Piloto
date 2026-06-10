@@ -582,6 +582,17 @@ export default function TripRequestForm({
       }
     }
 
+    // Buscar whatsapp actualizado do perfil
+    let clienteWhatsapp: string | null = user?.whatsapp || null
+    if (user?.id && !clienteWhatsapp) {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('whatsapp')
+        .eq('id', user.id)
+        .single()
+      clienteWhatsapp = profileData?.whatsapp || null
+    }
+
     try {
       const { data, error } = await supabase
         .from('trips')
@@ -597,6 +608,7 @@ export default function TripRequestForm({
             destination_lng: finalDestinationLng,
             quoted_price: quotedPrice,
             user_id: user?.id ?? null,
+            cliente_whatsapp: clienteWhatsapp,
           },
         ])
         .select('id');
