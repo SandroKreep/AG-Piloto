@@ -265,7 +265,7 @@ export default function HomeView({ onGoDriver }: Props) {
           <div className="home__hero-badges">
             <div className="home__hero-badge">
               <span className="home__hero-badge-dot" />
-              Motoristas disponíveis
+              Motoqueiros disponíveis
             </div>
             <div className="home__hero-badge">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="home__hero-badge-icon">
@@ -278,7 +278,7 @@ export default function HomeView({ onGoDriver }: Props) {
                   fill="none"
                 />
               </svg>
-              Moto · Carro · Caminhão
+              Moto · Kupapa
             </div>
           </div>
         </div>
