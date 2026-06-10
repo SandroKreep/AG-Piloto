@@ -444,13 +444,10 @@ export default function TripRequestForm({
   // Effect to listen for trip acceptance
   useEffect(() => {
     if (!activeTripId) {
-      console.log('🔍 DEBUG: No activeTripId, skipping listener setup')
       return
     }
 
     let isMounted = true
-
-    console.log('🔍 DEBUG: Setting up listener for trip', activeTripId)
 
     // Request notification permission
     if ('Notification' in window && Notification.permission === 'default') {
@@ -465,16 +462,11 @@ export default function TripRequestForm({
         { event: 'UPDATE', schema: 'public', table: 'trips', filter: `id=eq.${activeTripId}` },
         (payload: any) => {
           if (!isMounted) return
-          console.log('DEBUG: Trip update received:', payload)
-          console.log('DEBUG: New status:', payload.new.status)
-          console.log('DEBUG: Expected: ASSIGNED, Got:', payload.new.status)
           
           if (payload.new.status === 'ASSIGNED' || payload.new.status === 'assigned') {
-            console.log('SUCCESS: Trip accepted!')
             setTripAccepted(true)
             setAcceptedDriver(payload.new.motorista_nome || 'Motorista')
             setWaitingSeconds(0)
-            console.log('Trip accepted!', payload.new)
             
             // Send notification
             sendNotification('Pedido Aceito!', {
@@ -510,7 +502,6 @@ export default function TripRequestForm({
   useEffect(() => {
     if (activeTripId && latitude !== null && longitude !== null) {
       const updateLocation = async () => {
-        console.log(`Updating trip ${activeTripId} location to ${latitude}, ${longitude}`);
         const { error } = await supabase
           .from('trips')
           .update({ origin_lat: latitude, origin_lng: longitude })
@@ -582,16 +573,13 @@ export default function TripRequestForm({
       }
     }
 
-    // Buscar whatsapp actualizado do perfil
-    let clienteWhatsapp: string | null = user?.whatsapp || null
-    if (user?.id && !clienteWhatsapp) {
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('whatsapp')
-        .eq('id', user.id)
-        .single()
-      clienteWhatsapp = profileData?.whatsapp || null
-    }
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    const clienteWhatsapp = data?.whatsapp || null
 
     try {
       const { data, error } = await supabase

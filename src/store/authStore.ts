@@ -87,8 +87,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         email,
         password,
         options: {
-          data: { name },
-        },
+          data: {
+            full_name: name,
+            whatsapp: whatsapp,
+          }
+        }
       })
 
       if (error) throw error
