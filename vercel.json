@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
+    { "source": "/google2634727cd74474b7.html", "destination": "/google2634727cd74474b7.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
