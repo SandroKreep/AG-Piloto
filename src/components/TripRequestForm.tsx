@@ -145,7 +145,8 @@ export default function TripRequestForm({
   onReset?: () => void
   onOriginManuallyChosen?: () => void
 }) {
-  const { user } = useAuthStore() 
+  const { user, setShowAuthModal } = useAuthStore() 
+  const [mensagemErro, setMensagemErro] = useState<string | null>(null)
   const [originAddress, setOriginAddress] = useState(() => {
     return sessionStorage.getItem('ag_origin_address') || ''
   })
@@ -553,7 +554,8 @@ export default function TripRequestForm({
       finalDestinationLat = destinationCoords.lat
       finalDestinationLng = destinationCoords.lng
     } else {
-      alert('Por favor, selecione um destino no mapa.');
+      setMensagemErro('Por favor, selecione um destino no mapa.')
+      setTimeout(() => setMensagemErro(null), 4000)
       setLoading(false);
       return;
     }
@@ -628,7 +630,8 @@ export default function TripRequestForm({
       setShowPermissionWarning(false);
       setGpsObtained(false);
     } catch (err: any) {
-      alert(`Erro ao solicitar viagem: ${err.message}`);
+      setMensagemErro(`Erro ao solicitar viagem: ${err.message}`)
+      setTimeout(() => setMensagemErro(null), 4000)
       setActiveTripId(null);
     } finally {
       setLoading(false);
@@ -637,6 +640,10 @@ export default function TripRequestForm({
 
   const handleShowSummary = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user) {
+      setShowAuthModal(true)
+      return
+    }
     setShowSummary(true)
   }
 
@@ -852,6 +859,29 @@ export default function TripRequestForm({
           <option value="moto">Moto-Táxi</option>
         </select>
       </div>
+
+      {mensagemErro && (
+        <div style={{
+          background: '#fff3ed',
+          border: '1px solid #ff6b00',
+          borderLeft: '4px solid #ff6b00',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          color: '#cc4400',
+          fontSize: '0.9rem',
+          fontWeight: 500,
+          marginBottom: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#ff6b00" strokeWidth="2"/>
+            <path d="M12 8v4M12 16h.01" stroke="#ff6b00" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          {mensagemErro}
+        </div>
+      )}
 
       <button
         type="submit"
