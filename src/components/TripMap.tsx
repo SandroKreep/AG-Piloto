@@ -146,7 +146,7 @@ function MapClickHandler({
   return null;
 }
 
-function MyLocationMarker({ activeTripId, setGpsCoords, onGpsCoordsChange, onHeadingChange }: { activeTripId: string | null; setGpsCoords: (coords: Coordinates | null) => void; onGpsCoordsChange?: (coords: Coordinates) => void; onHeadingChange?: (heading: number) => void }) {
+function MyLocationMarker({ activeTripId, setGpsCoords, onGpsCoordsChange }: { activeTripId: string | null; setGpsCoords: (coords: Coordinates | null) => void; onGpsCoordsChange?: (coords: Coordinates) => void }) {
   const [position, setPosition] = useState<L.LatLngExpression | null>(null)
   const [showLocationWarning, setShowLocationWarning] = useState(false) // New state for warning
   const map = useMap()
@@ -160,9 +160,6 @@ function MyLocationMarker({ activeTripId, setGpsCoords, onGpsCoordsChange, onHea
     const watchId = navigator.geolocation.watchPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords
-        if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) {
-          onHeadingChange?.(pos.coords.heading)
-        }
         if (!isValidLuandaCoordinate(latitude, longitude)) {
           setShowLocationWarning(true)
           // Do not update position or move map if outside Luanda
@@ -267,7 +264,6 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [showLocationWarning, setShowLocationWarning] = useState(false) // State for 'Destino fora da área de atuação'
   const [gpsCoords, setGpsCoords] = useState<Coordinates | null>(null) // Track GPS coordinates
-  const [heading, setHeading] = useState<number>(0)
 
   const mapRef = useRef<L.Map>(null); // Add map ref
   const originMarkerRef = useRef<L.Marker | null>(null);
@@ -580,8 +576,7 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
 
   return (
     <section className="trip-map" aria-label="Mapa de rota com Leaflet">
-        <div style={{ transform: `rotate(${-heading}deg)`, transformOrigin: 'center center', transition: 'transform 0.3s ease', width: '100%', height: '100%' }}>
-          <MapContainer ref={mapRef} center={center} zoom={13} scrollWheelZoom={false} className="trip-map__canvas">
+        <MapContainer ref={mapRef} center={center} zoom={13} scrollWheelZoom={false} className="trip-map__canvas">
           <MapClickHandler
             setDestinationCoords={setDestinationCoords}
             setDestinationAddress={setDestinationAddress}
@@ -640,12 +635,11 @@ export default function TripMap({ destinationCoords, setDestinationCoords, desti
               <Popup>Destino: {activeTrip.destination_address}</Popup>
             </Marker>
           )}
-          <MyLocationMarker activeTripId={activeTripId} setGpsCoords={setGpsCoords} onGpsCoordsChange={onGpsCoordsChange} onHeadingChange={setHeading} />
+          <MyLocationMarker activeTripId={activeTripId} setGpsCoords={setGpsCoords} onGpsCoordsChange={onGpsCoordsChange} />
           {activeTrip && activeTrip.status === 'accepted' && activeTripId && (
             <DriverTracking driverId={activeTrip.driver_id || null} tripId={activeTripId} />
           )}
         </MapContainer>
-        </div>
         <div className="trip-map__meta">
           {activeTrip && (
             <dl className="trip-map__meta-list">
