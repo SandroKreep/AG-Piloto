@@ -1,20 +1,5 @@
 {
-  "routes": [
-    {
-      "src": "/sitemap.xml",
-      "dest": "/api/sitemap.xml"
-    },
-    {
-      "src": "/google2634727cd74474b7.html",
-      "dest": "/google2634727cd74474b7.html"
-    },
-    {
-      "src": "^/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

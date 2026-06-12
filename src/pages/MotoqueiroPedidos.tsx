@@ -318,6 +318,7 @@ export default function MotoqueiroPedidos() {
       .select('*')
       .in('status', ['PENDING', 'pending', 'REQUESTED', 'requested'])
       .is('motorista_id', null)
+      .eq('archived', false)
       .order('created_at', { ascending: false })
     
     console.log('Pedidos carregados:', data?.length, 'Erro:', error)
@@ -363,6 +364,7 @@ export default function MotoqueiroPedidos() {
       .select('*')
       .in('status', ['ASSIGNED', 'assigned', 'ACCEPTED', 'accepted'])
       .eq('motorista_id', motorista.id)
+      .eq('archived', false)
       .order('created_at', { ascending: false })
     
     const { data: fretesData } = await supabase
