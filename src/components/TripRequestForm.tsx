@@ -372,8 +372,8 @@ export default function TripRequestForm({
       const routeInfo = await fetchOsrmRoute(origin, dest)
       const distanceKm = routeInfo.distanceMeters / 1000
       const durationMin = routeInfo.durationSeconds / 60
-      // Rule: 500 Kz base + 300 Kz per km
-      const price = 500 + Math.round(distanceKm * 300)
+      // Rule: 300 Kz base + 300 Kz per km
+      const price = 300 + Math.round(distanceKm * 300)
 
       setRouteData({
         distanceKm: Number(distanceKm.toFixed(2)),
@@ -567,8 +567,8 @@ export default function TripRequestForm({
         const destination: Coordinates = { lat: finalDestinationLat, lng: finalDestinationLng }
         const routeData = await fetchOsrmRoute(origin, destination)
         const distanceKm = routeData.distanceMeters / 1000
-        // Rule: 500 Kz base + 300 Kz per km
-        quotedPrice = 500 + Math.round(distanceKm * 300)
+        // Rule: 300 Kz base + 300 Kz per km
+        quotedPrice = 300 + Math.round(distanceKm * 300)
       } catch (osrmError) {
         console.error('Error calculating route distance with OSRM:', osrmError)
         quotedPrice = null
