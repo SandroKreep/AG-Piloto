@@ -150,6 +150,7 @@ function MyLocationMarker({ activeTripId, setGpsCoords, onGpsCoordsChange }: { a
   const [position, setPosition] = useState<L.LatLngExpression | null>(null)
   const [showLocationWarning, setShowLocationWarning] = useState(false) // New state for warning
   const map = useMap()
+  const mapCentradoRef = useRef(false) // Controla se o mapa já foi centrado
 
   useEffect(() => {
     if (!('geolocation' in navigator)) {
@@ -173,8 +174,11 @@ function MyLocationMarker({ activeTripId, setGpsCoords, onGpsCoordsChange }: { a
         onGpsCoordsChange?.({ lat: latitude, lng: longitude }); // Notify parent of GPS coordinates
         setGpsCoords({ lat: latitude, lng: longitude }); // Update GPS coordinates
 
-        // Centra o mapa sempre que a posição GPS actualizar
-        map.setView([latitude, longitude], map.getZoom())
+        // Centra o mapa apenas na primeira posição GPS
+        if (!mapCentradoRef.current) {
+          map.setView([latitude, longitude], map.getZoom())
+          mapCentradoRef.current = true
+        }
 
         if (activeTripId) {
           const { error } = await supabase
