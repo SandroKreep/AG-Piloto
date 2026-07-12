@@ -475,6 +475,29 @@ export default function MotoqueiroPedidos() {
     }
   }
 
+  const concluirPedido = async (tripId: string) => {
+    if (!motorista) return
+
+    const { error } = await supabase
+      .from('trips')
+      .update({
+        status: 'COMPLETED',
+        motorista_id: null,
+        motorista_nome: null,
+        motorista_whatsapp: null,
+      })
+      .eq('id', tripId)
+      .eq('motorista_id', motorista.id)
+
+    if (!error) {
+      setMeusPedidos(prev => prev.filter(p => p.id !== tripId))
+      if (pedidoSelecionado?.id === tripId) {
+        setPedidoSelecionado(null)
+        setRota([])
+      }
+    }
+  }
+
   const notificarBrowser = (trip: Trip) => {
     const notificar = async () => {
       if (Notification.permission === 'default') {
@@ -948,6 +971,16 @@ export default function MotoqueiroPedidos() {
                 }}
               >
                 Cancelar
+              </button>
+              <button
+                className="moto-card__cancelar"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  concluirPedido(pedido.id)
+                }}
+                style={{ marginLeft: '8px', backgroundColor: '#16a34a' }}
+              >
+                Concluído
               </button>
             </div>
           </div>
