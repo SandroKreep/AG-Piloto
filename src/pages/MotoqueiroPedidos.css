@@ -191,6 +191,41 @@
   transform: translateY(-1px);
 }
 
+.moto-card__cancelar {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.moto-card__cancelar:hover {
+  background: #fee2e2;
+  transform: translateY(-1px);
+}
+
+.moto-card__concluir {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+  transition: all 0.2s;
+}
+
+.moto-card__concluir:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+}
+
 .moto-badge-aceite {
   background: #dcfce7;
   color: #15803d;

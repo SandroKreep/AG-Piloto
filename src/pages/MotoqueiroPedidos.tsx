@@ -973,12 +973,11 @@ export default function MotoqueiroPedidos() {
                 Cancelar
               </button>
               <button
-                className="moto-card__cancelar"
+                className="moto-card__concluir"
                 onClick={(e) => {
                   e.stopPropagation()
                   concluirPedido(pedido.id)
                 }}
-                style={{ marginLeft: '8px', backgroundColor: '#16a34a' }}
               >
                 Concluído
               </button>
