@@ -63,10 +63,7 @@ function ServiceIcon({ item }: { item: ServiceItem }) {
         )
       case 'cross':
         return (
-          <>
-            <path d="M12 8v8M9 11h6" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" />
-            <rect x="6" y="5" width="12" height="14" rx="2" stroke="#16a34a" strokeWidth="2" fill="none" />
-          </>
+          <path d="M12 8v8M9 11h6" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" />
         )
       case 'bag':
         return (
@@ -93,9 +90,10 @@ function ServiceIcon({ item }: { item: ServiceItem }) {
         return (
           <>
             <rect x="2" y="8" width="13" height="8" rx="1" stroke="currentColor" strokeWidth="1.4" fill="none" />
-            <path d="M15 12h4l2-4v8h-6v-4z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            <path d="M15 8h4l3 3v5h-7V8z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
             <circle cx="6" cy="18" r="2" stroke="currentColor" strokeWidth="1.4" fill="none" />
             <circle cx="18" cy="18" r="2" stroke="currentColor" strokeWidth="1.4" fill="none" />
+            <path d="M15 8v5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
           </>
         )
     }

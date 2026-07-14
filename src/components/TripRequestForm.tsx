@@ -150,7 +150,6 @@ export default function TripRequestForm({
   const [originAddress, setOriginAddress] = useState(() => {
     return sessionStorage.getItem('ag_origin_address') || ''
   })
-  const [serviceType, setServiceType] = useState<'moto' | 'carro' | 'caminhao'>('moto')
   const [loading, setLoading] = useState(false)
   const [latitude, setLatitude] = useState<number | null>(null)
   const [longitude, setLongitude] = useState<number | null>(null)
@@ -591,7 +590,7 @@ export default function TripRequestForm({
             origin_address: originAddress,
             destination_address: destinationAddress,
             status: 'pending',
-            service_type: serviceType,
+            service_type: 'moto',
             origin_lat: finalOriginLat,
             origin_lng: finalOriginLng,
             destination_lat: finalDestinationLat,
@@ -626,7 +625,6 @@ export default function TripRequestForm({
       setTimeout(() => setSuccessModal(false), 4000)
       setOriginAddress('');
       setDestinationAddress('');
-      setServiceType('moto');
       setShowPermissionWarning(false);
       setGpsObtained(false);
     } catch (err: any) {
@@ -668,12 +666,6 @@ export default function TripRequestForm({
             <span style={summaryValueStyles}>{destinationAddress?.substring(0, 25)}...</span>
           </div>
           
-          <div style={summaryRowStyles}>
-            <span style={summaryLabelStyles}>Serviço</span>
-            <span style={summaryValueStyles}>
-              {serviceType === 'moto' ? 'Moto-Táxi' : serviceType === 'carro' ? 'Familiar' : 'Frete'}
-            </span>
-          </div>
 
           <div style={{ ...summaryRowStyles, borderBottom: 'none', marginTop: '5px', paddingTop: '10px', borderTop: '1px solid #e5e7eb' }}>
             <span style={summaryLabelStyles}>Distância</span>
@@ -735,13 +727,8 @@ export default function TripRequestForm({
       )}
 
       {!destinationCoords && (
-        <div style={{ color: '#F97316', marginBottom: '10px', textAlign: 'center', fontWeight: '500', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-          Selecione um destino no mapa
+        <div style={{ color: '#999', marginBottom: '10px', textAlign: 'center', fontSize: '13px' }}>
+          Selecione um destino no mapa manualmente (opcional)
         </div>
       )}
 
@@ -846,18 +833,6 @@ export default function TripRequestForm({
             </div>
           )}
         </div>
-      </div>
-
-      <div style={{ marginBottom: '12px' }}>
-        <label style={{ fontSize: '11px', color: '#999', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>TIPO DE SERVIÇO</label>
-        <select
-          value={serviceType}
-          onChange={(e) => setServiceType(e.target.value as 'moto')}
-          style={{ ...inputStyles, width: '100%' }}
-          required
-        >
-          <option value="moto">Moto-Táxi</option>
-        </select>
       </div>
 
       {mensagemErro && (
