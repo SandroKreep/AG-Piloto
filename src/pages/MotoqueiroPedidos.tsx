@@ -152,6 +152,17 @@ export default function MotoqueiroPedidos() {
                 return [payload.new as Trip, ...prev]
               })
             }
+          } else if ((payload.new.status === 'PENDING' || payload.new.status === 'pending') &&
+                     (payload.old.status === 'ASSIGNED' || payload.old.status === 'assigned' ||
+                      payload.old.status === 'ACCEPTED' || payload.old.status === 'accepted')) {
+            // Pedido voltou a ficar disponível após cancelamento
+            if (!payload.new.motorista_id) {
+              setPedidos(prev => {
+                if (prev.some(p => p.id === payload.new.id)) return prev
+                return [payload.new as Trip, ...prev]
+              })
+            }
+            setMeusPedidos(prev => prev.filter(p => p.id !== payload.new.id))
           }
         }
       )
@@ -218,6 +229,33 @@ export default function MotoqueiroPedidos() {
               }
               setMeusPedidos(prev => [freteConvertido as Trip, ...prev])
             }
+          } else if (payload.new.status === 'pendente' &&
+                     (payload.old.status === 'aceite')) {
+            // Frete voltou a ficar disponível após cancelamento
+            if (!payload.new.motorista_id) {
+              const freteConvertido = {
+                id: payload.new.id,
+                status: payload.new.status,
+                service_type: 'frete',
+                origin_address: payload.new.origem_address || '',
+                destination_address: payload.new.destino_address || '',
+                quoted_price: payload.new.quoted_price,
+                created_at: payload.new.created_at,
+                motorista_id: null,
+                origin_lat: payload.new.origem_lat,
+                origin_lng: payload.new.origem_lng,
+                destination_lat: payload.new.destino_lat,
+                destination_lng: payload.new.destino_lng,
+                foto_url: payload.new.foto_url || null,
+                cliente_whatsapp: payload.new.whatsapp || null,
+                _is_frete: true,
+              }
+              setFretes(prev => {
+                if (prev.some(f => f.id === payload.new.id)) return prev
+                return [freteConvertido as Trip, ...prev]
+              })
+            }
+            setMeusPedidos(prev => prev.filter(p => p.id !== payload.new.id))
           }
         }
       )
@@ -452,13 +490,35 @@ export default function MotoqueiroPedidos() {
     setAceitando(null)
   }
 
-  const cancelarPedido = async (tripId: string) => {
+  const cancelarPedido = async (tripId: string, isFrete?: boolean) => {
     if (!motorista) return
+
+    if (isFrete) {
+      const { error } = await supabase
+        .from('fretes')
+        .update({
+          status: 'pendente',
+          motorista_id: null,
+          motorista_nome: null,
+          motorista_whatsapp: null,
+        })
+        .eq('id', tripId)
+        .eq('motorista_id', motorista.id)
+
+      if (!error) {
+        setMeusPedidos(prev => prev.filter(p => p.id !== tripId))
+        if (pedidoSelecionado?.id === tripId) {
+          setPedidoSelecionado(null)
+          setRota([])
+        }
+      }
+      return
+    }
 
     const { error } = await supabase
       .from('trips')
       .update({
-        status: 'CANCELLED',
+        status: 'PENDING',
         motorista_id: null,
         motorista_nome: null,
         motorista_whatsapp: null,
@@ -475,8 +535,30 @@ export default function MotoqueiroPedidos() {
     }
   }
 
-  const concluirPedido = async (tripId: string) => {
+  const concluirPedido = async (tripId: string, isFrete?: boolean) => {
     if (!motorista) return
+
+    if (isFrete) {
+      const { error } = await supabase
+        .from('fretes')
+        .update({
+          status: 'concluido',
+          motorista_id: null,
+          motorista_nome: null,
+          motorista_whatsapp: null,
+        })
+        .eq('id', tripId)
+        .eq('motorista_id', motorista.id)
+
+      if (!error) {
+        setMeusPedidos(prev => prev.filter(p => p.id !== tripId))
+        if (pedidoSelecionado?.id === tripId) {
+          setPedidoSelecionado(null)
+          setRota([])
+        }
+      }
+      return
+    }
 
     const { error } = await supabase
       .from('trips')
@@ -968,7 +1050,7 @@ export default function MotoqueiroPedidos() {
                 className="moto-card__cancelar"
                 onClick={(e) => {
                   e.stopPropagation()
-                  cancelarPedido(pedido.id)
+                  cancelarPedido(pedido.id, (pedido as any)._is_frete)
                 }}
               >
                 Cancelar
@@ -977,7 +1059,7 @@ export default function MotoqueiroPedidos() {
                 className="moto-card__concluir"
                 onClick={(e) => {
                   e.stopPropagation()
-                  concluirPedido(pedido.id)
+                  concluirPedido(pedido.id, (pedido as any)._is_frete)
                 }}
               >
                 Concluído

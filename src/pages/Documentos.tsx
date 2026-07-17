@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
+import ToastNotification from '../components/ToastNotification'
 import './Documentos.css'
 
 type FormData = {
@@ -46,6 +47,7 @@ export default function Documentos() {
   const [motoristaInfo, setMotoristaInfo] = useState<{
     nome: string, whatsapp: string, foto_url?: string
   } | null>(null)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
 
   const origemDebounceRef = useRef<number | null>(null)
   const destinoDebounceRef = useRef<number | null>(null)
@@ -101,6 +103,39 @@ export default function Documentos() {
             whatsapp: payload.new.motorista_whatsapp || '',
             foto_url: payload.new.motorista_foto_url
           })
+        } else if ((payload.new.status === 'PENDING' || payload.new.status === 'pending') &&
+                   (payload.old.status === 'ASSIGNED' || payload.old.status === 'assigned' ||
+                    payload.old.status === 'ACCEPTED' || payload.old.status === 'accepted')) {
+          const audio = new Audio('/notification.mp3')
+          audio.play().catch(() => {})
+          
+          if (Notification.permission === 'granted') {
+            new Notification('Pedido Cancelado', {
+              body: 'O motoqueiro cancelou o pedido de documentos',
+              icon: '/favicon.ico'
+            })
+          }
+          
+          setToast({ message: 'O motoqueiro cancelou o pedido de documentos', type: 'error' })
+          setTripAceite(false)
+          setMotoristaInfo(null)
+          setActiveTripId(null)
+        } else if (payload.new.status === 'COMPLETED' || 
+                   payload.new.status === 'completed') {
+          const audio = new Audio('/notification.mp3')
+          audio.play().catch(() => {})
+          
+          if (Notification.permission === 'granted') {
+            new Notification('Pedido Concluído', {
+              body: 'O motoqueiro concluiu a entrega dos documentos com sucesso',
+              icon: '/favicon.ico'
+            })
+          }
+          
+          setToast({ message: 'Pedido concluído com sucesso!', type: 'success' })
+          setTripAceite(false)
+          setMotoristaInfo(null)
+          setActiveTripId(null)
         }
       })
       .subscribe()
@@ -441,6 +476,14 @@ export default function Documentos() {
           {loading ? 'A enviar...' : 'Solicitar Motoqueiro'}
         </button>
       </form>
+      
+      {toast && (
+        <ToastNotification
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }

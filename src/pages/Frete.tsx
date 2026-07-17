@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { supabase } from '../lib/supabase'
 import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
+import ToastNotification from '../components/ToastNotification'
 import './Frete.css'
 
 type FormData = {
@@ -52,6 +53,7 @@ export default function Frete() {
   const [motoristaInfo, setMotoristaInfo] = useState<{
     nome: string, whatsapp: string, foto_url?: string
   } | null>(null)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
 
   const origemDebounceRef = useRef<number | null>(null)
   const destinoDebounceRef = useRef<number | null>(null)
@@ -98,6 +100,36 @@ export default function Frete() {
             whatsapp: payload.new.motorista_whatsapp || '',
             foto_url: payload.new.motorista_foto_url
           })
+        } else if (payload.new.status === 'pendente') {
+          const audio = new Audio('/notification.mp3')
+          audio.play().catch(() => {})
+          
+          if (Notification.permission === 'granted') {
+            new Notification('Frete Cancelado', {
+              body: 'O motoqueiro cancelou o frete',
+              icon: '/favicon.ico'
+            })
+          }
+          
+          setToast({ message: 'O motoqueiro cancelou o frete', type: 'error' })
+          setFreteAceite(false)
+          setMotoristaInfo(null)
+          setFreteAceiteId(null)
+        } else if (payload.new.status === 'concluido') {
+          const audio = new Audio('/notification.mp3')
+          audio.play().catch(() => {})
+          
+          if (Notification.permission === 'granted') {
+            new Notification('Frete Concluído', {
+              body: 'O motoqueiro concluiu o frete com sucesso',
+              icon: '/favicon.ico'
+            })
+          }
+          
+          setToast({ message: 'Frete concluído com sucesso!', type: 'success' })
+          setFreteAceite(false)
+          setMotoristaInfo(null)
+          setFreteAceiteId(null)
         }
       })
       .subscribe()
@@ -713,6 +745,14 @@ export default function Frete() {
           {loading ? 'A enviar...' : 'Solicitar Kupapata'}
         </button>
       </form>
+      
+      {toast && (
+        <ToastNotification
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }

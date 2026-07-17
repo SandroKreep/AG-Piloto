@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
 import { reverseGeocodeCoordinates } from '../lib/geoUtils'
 import TripAcceptedView from './TripAcceptedView'
+import ToastNotification from './ToastNotification'
 import { useAuthStore } from '../store/authStore'
 import './TripRequestForm.css'
 
@@ -181,6 +182,7 @@ export default function TripRequestForm({
   const [waitingSeconds, setWaitingSeconds] = useState(0)
   const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [successModal, setSuccessModal] = useState(false)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
   
   // Autocomplete states for destination
   const [destinoTexto, setDestinoTexto] = useState('')
@@ -479,6 +481,49 @@ export default function TripRequestForm({
             waitingTimerRef.current = setInterval(() => {
               setWaitingSeconds(prev => prev + 1)
             }, 1000)
+          } else if ((payload.new.status === 'PENDING' || payload.new.status === 'pending') && 
+                     (payload.old.status === 'ASSIGNED' || payload.old.status === 'assigned' || 
+                      payload.old.status === 'ACCEPTED' || payload.old.status === 'accepted')) {
+            // Pedido foi cancelado pelo motoqueiro (só se estava aceito antes)
+            sendNotification('Viagem Cancelada', {
+              body: 'O motoqueiro cancelou a viagem',
+              icon: '/favicon.ico'
+            })
+            setToast({ message: 'O motoqueiro cancelou a viagem', type: 'error' })
+            setShowSummary(false)
+            setTripAccepted(false)
+            setAcceptedDriver(null)
+            setActiveTripId(null)
+            localStorage.removeItem('activeTripId')
+            setOriginAddress('')
+            setDestinationAddress(null)
+            setDestinationCoords(null)
+            setWaitingSeconds(0)
+            setDriverLocation(null)
+            destinoFixo.current = false
+            originCoordsRef.current = null
+            originFixed.current = false
+            originLockedRef.current = false
+            setOriginSuggestions([])
+            setShowOriginSuggestions(false)
+            setOriginSearchLoading(false)
+            setUserEditedOrigin(false)
+            sessionStorage.removeItem('ag_origin_address')
+            sessionStorage.removeItem('ag_destination_coords')
+            sessionStorage.removeItem('ag_destination_address')
+            if (waitingTimerRef.current) clearInterval(waitingTimerRef.current)
+          } else if (payload.new.status === 'COMPLETED' || payload.new.status === 'completed') {
+            // Viagem foi concluída
+            sendNotification('Viagem Concluída', {
+              body: 'O motoqueiro concluiu a viagem com sucesso',
+              icon: '/favicon.ico'
+            })
+            setToast({ message: 'Viagem concluída com sucesso!', type: 'success' })
+            setTripAccepted(false)
+            setAcceptedDriver(null)
+            setActiveTripId(null)
+            if (waitingTimerRef.current) clearInterval(waitingTimerRef.current)
+ if (onReset) onReset()
           }
         }
       )
@@ -993,6 +1038,14 @@ export default function TripRequestForm({
             sessionStorage.removeItem('ag_destination_address')
             if (waitingTimerRef.current) clearInterval(waitingTimerRef.current)
           }}
+        />
+      )}
+      
+      {toast && (
+        <ToastNotification
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </form>

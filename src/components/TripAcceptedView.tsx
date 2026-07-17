@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Clock, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { fetchOsrmRoute, type Coordinates } from '../services/osrm'
+import ToastNotification from './ToastNotification'
 import './TripAcceptedView.css'
 
 interface TripAcceptedViewProps {
@@ -24,6 +25,7 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
   const [routeInfo, setRouteInfo] = useState<{ distanceKm: number; durationMin: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [minimizado, setMinimizado] = useState(false)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -76,7 +78,22 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
               body: 'O motoqueiro cancelou a viagem',
               icon: '/favicon.ico'
             })
-            alert('O motoqueiro cancelou a viagem')
+            onNewTrip()
+          } else if ((payload.new.status === 'PENDING' || payload.new.status === 'pending') &&
+                     (payload.old.status === 'ASSIGNED' || payload.old.status === 'assigned' ||
+                      payload.old.status === 'ACCEPTED' || payload.old.status === 'accepted')) {
+            sendNotification('Viagem Cancelada', {
+              body: 'O motoqueiro cancelou a viagem',
+              icon: '/favicon.ico'
+            })
+            setToast({ message: 'O motoqueiro cancelou a viagem', type: 'error' })
+            onNewTrip()
+          } else if (payload.new.status === 'COMPLETED') {
+            sendNotification('Viagem Concluída', {
+              body: 'O motoqueiro concluiu a viagem com sucesso',
+              icon: '/favicon.ico'
+            })
+            setToast({ message: 'Viagem concluída com sucesso!', type: 'success' })
             onNewTrip()
           } else if (payload.new.status === 'ASSIGNED') {
             setTripDetails(prev => ({ 
@@ -284,6 +301,14 @@ export default function TripAcceptedView({ tripId, driverName = 'Motoqueiro', on
         )}
 
       </div>
+      
+      {toast && (
+        <ToastNotification
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }
